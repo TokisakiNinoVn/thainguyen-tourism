@@ -11,7 +11,7 @@ using System.Text;
 using BCrypt;
 using Microsoft.AspNetCore.Authorization;
 
-[Route("api/[controller]")]
+[Route("api/admin/auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -84,10 +84,88 @@ public class AuthController : ControllerBase
             message = "Đăng nhập thành công",
             data = new
             {
-                role = existing.Role,
+                // role = existing.Role,
+                email = existing.Email,
+                name = existing.DisplayName,
+                photoURL = existing.PhotoURL,
                 token
             }
         });
+    }
+
+    [HttpGet("check-auth")]
+    public IActionResult Me()
+    {
+        try
+        {
+            var authHeader = Request.Headers["Authorization"].ToString();
+            var token = authHeader.StartsWith("Bearer ") ? authHeader.Substring(7) : authHeader;
+
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new Exception("JWT_KEY is not configured in the environment variables.");
+            }
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero // không cho phép lệch thời gian
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            var email = jwtToken.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null)
+            {
+                return Unauthorized(new
+                {
+                    code = 401,
+                    status = "error",
+                    message = "Không tìm thấy người dùng",
+                    data = (object?)null
+                });
+            }
+
+            return Ok(new
+            {
+                code = 200,
+                status = "success",
+                message = "Lấy thông tin người dùng thành công",
+                data = new
+                {
+                    user.Email,
+                    user.DisplayName,
+                    user.PhotoURL,
+                }
+            });
+        }
+        catch (SecurityTokenExpiredException)
+        {
+            return Unauthorized(new
+            {
+                code = 401,
+                status = "error",
+                message = "Hết phiên đăng nhập",
+                data = "/login"
+            });
+        }
+        catch (Exception)
+        {
+            return Unauthorized(new
+            {
+                code = 401,
+                status = "error",
+                message = "Token không hợp lệ",
+                data = (object?)null
+            });
+        }
     }
 
     private string GenerateJwtToken(User user)

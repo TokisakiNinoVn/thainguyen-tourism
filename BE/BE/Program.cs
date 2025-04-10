@@ -43,12 +43,14 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:8080") // Tôi muốn cho phép từ tất cả địa chỉ
+        policy
+            .WithOrigins("http://localhost:8080", "http://localhost:8081")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); 
+            .AllowCredentials();
     });
 });
+
 
 // ======= JWT Authentication =======
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
