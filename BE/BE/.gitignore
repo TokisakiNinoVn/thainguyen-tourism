@@ -1,0 +1,36 @@
+# Bỏ qua thư mục build
+bin/
+obj/
+
+# Bỏ qua thư mục tạm và cài đặt của VS
+.vs/
+*.user
+*.suo
+
+# File tạm hoặc cache
+*.log
+*.tmp
+*.bak
+
+# File cấu hình nhạy cảm
+.env
+
+# Bỏ qua cấu hình riêng cho môi trường
+appsettings.Development.json
+
+# Bỏ qua các file http request (nếu không cần tracking)
+*.http
+
+# Bỏ qua file publish
+**/publish/
+**/Backup*/  # backup folder nếu tự động tạo
+backup/
+
+# Bỏ qua thư viện do NuGet restore
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Bỏ qua các file hệ điều hành
+.DS_Store
+Thumbs.db
