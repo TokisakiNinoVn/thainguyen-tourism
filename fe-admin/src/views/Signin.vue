@@ -117,7 +117,7 @@ const handleLogin = async () => {
   try {
     const response = await login({ email: email.value, password: password.value });
     console.log("Login success:", response);
-    localStorage.setItem("token", response.token);
+    localStorage.setItem("token", response.data.token);
     localStorage.setItem("timeLogin", new Date().getTime());
 
     // Chuyển hướng sau đăng nhập

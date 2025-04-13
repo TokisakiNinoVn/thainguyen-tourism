@@ -25,7 +25,7 @@ instance.interceptors.response.use(
   (response) => {
     // Nếu dữ liệu trả về theo định dạng { data: { ... } }
     if (response.data && response.data.data) {
-      return response.data.data;
+      return response.data;
     }
     return response.data;
   },

@@ -119,10 +119,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// builder.Services.AddSwaggerGen(options =>
+// {
+//     options.SupportNonNullableReferenceTypes();
+// });
+app.UseDeveloperExceptionPage();
+app.UseExceptionHandler("/error");
+
+// app.UseStaticFiles();
+app.UseCors();
+var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+contentTypeProvider.Mappings[".geojson"] = "application/geo+json";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = contentTypeProvider
+});
 
 app.UseHttpsRedirection();
-
-app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

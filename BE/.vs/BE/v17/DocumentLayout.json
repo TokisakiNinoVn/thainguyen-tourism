@@ -1,14 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Code\\ASP\\BE\\",
+  "WorkspaceRootPath": "C:\\Code\\chaythue\\web-hoang\\code\\BE\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6BA73F92-717E-4000-89DE-1524372AC6F0}|BE\\BE.csproj|c:\\code\\asp\\be\\be\\controllers\\web\\auth\\authwebcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6BA73F92-717E-4000-89DE-1524372AC6F0}|BE\\BE.csproj|solutionrelative:be\\controllers\\web\\auth\\authwebcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Code\\chaythue\\web-hoang\\code\\BE\\BE\\Controllers\\web\\auth\\AuthWebController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:BE\\Controllers\\web\\auth\\AuthWebController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6BA73F92-717E-4000-89DE-1524372AC6F0}|BE\\BE.csproj|c:\\code\\asp\\be\\be\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6BA73F92-717E-4000-89DE-1524372AC6F0}|BE\\BE.csproj|solutionrelative:be\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Code\\chaythue\\web-hoang\\code\\BE\\BE\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:BE\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -24,22 +24,21 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "User.cs",
-              "DocumentMoniker": "C:\\Code\\ASP\\BE\\BE\\Models\\User.cs",
+              "DocumentMoniker": "C:\\Code\\chaythue\\web-hoang\\code\\BE\\BE\\Models\\User.cs",
               "RelativeDocumentMoniker": "BE\\Models\\User.cs",
-              "ToolTip": "C:\\Code\\ASP\\BE\\BE\\Models\\User.cs",
+              "ToolTip": "C:\\Code\\chaythue\\web-hoang\\code\\BE\\BE\\Models\\User.cs",
               "RelativeToolTip": "BE\\Models\\User.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-09T10:05:11.364Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-09T10:05:11.364Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "AuthWebController.cs",
-              "DocumentMoniker": "C:\\Code\\ASP\\BE\\BE\\Controllers\\web\\auth\\AuthWebController.cs",
+              "DocumentMoniker": "C:\\Code\\chaythue\\web-hoang\\code\\BE\\BE\\Controllers\\web\\auth\\AuthWebController.cs",
               "RelativeDocumentMoniker": "BE\\Controllers\\web\\auth\\AuthWebController.cs",
-              "ToolTip": "C:\\Code\\ASP\\BE\\BE\\Controllers\\web\\auth\\AuthWebController.cs",
+              "ToolTip": "C:\\Code\\chaythue\\web-hoang\\code\\BE\\BE\\Controllers\\web\\auth\\AuthWebController.cs",
               "RelativeToolTip": "BE\\Controllers\\web\\auth\\AuthWebController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",

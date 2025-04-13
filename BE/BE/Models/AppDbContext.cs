@@ -1,4 +1,4 @@
-﻿// namespace BE.Models;
+﻿// AppDbContext.cs
 using Microsoft.EntityFrameworkCore;
 using BE.Models;
 
@@ -19,5 +19,8 @@ public class AppDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+
+    public DbSet<Place> Places { get; set; }
+    public DbSet<PlaceMedia> PlaceMedia { get; set; }
 }
 
