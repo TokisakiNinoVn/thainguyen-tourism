@@ -74,7 +74,7 @@ const handleLogin = async () => {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('user', JSON.stringify(data));
 
-    router.push('/blank');
+    router.push('/');
   } catch (error) {
     console.error(error);
     errorMessage.value = error.response?.data?.message || 'Đăng nhập thất bại';
@@ -105,7 +105,7 @@ const handleGoogleLogin = async () => {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('user', JSON.stringify(userData));
 
-    router.push('/blank');
+    router.push('/');
   } catch (error) {
     console.error('Google login error:', error);
     errorMessage.value = 'Đăng nhập Google thất bại';

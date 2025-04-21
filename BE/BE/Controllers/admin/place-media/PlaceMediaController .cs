@@ -25,6 +25,7 @@ namespace BE.Controllers
         [HttpPost("upload-single")]
         public async Task<IActionResult> UploadSingle([FromForm] UploadSingleRequest request)
         {
+            Console.WriteLine("UploadSingleRequest: " + request.ToString());
             if (request.File == null || request.File.Length == 0)
                 return BadRequest("File is empty");
 
@@ -49,7 +50,8 @@ namespace BE.Controllers
                 MediaUrl = $"/uploads/{fileName}",
                 MediaType = request.Type,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                ImageFor = request.ImageFor // thumbnail, place media
             };
 
             _context.PlaceMedia.Add(media);
@@ -101,5 +103,42 @@ namespace BE.Controllers
             await _context.SaveChangesAsync();
             return Ok(results);
         }
+
+        // GET: api/PlaceMedia/all/:id - get all media for a place
+        [HttpGet("all/{id}")]
+        public async Task<IActionResult> GetAll(int id) // hoặc [FromRoute] int id
+        {
+            var media = await _context.PlaceMedia
+                .Where(m => m.PlaceId == id && m.ImageFor == "place-media")
+                .ToListAsync();
+
+            if (media == null || media.Count == 0)
+                return NotFound("No media found for this place");
+
+            return Ok(media);
+        }
+
+
+        // DELETE: api/PlaceMedia/delete/{id} - delete a media by id
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var media = await _context.PlaceMedia.FindAsync(id);
+            if (media == null)
+                return NotFound("Media not found");
+
+            // Delete the file from the server
+            var filePath = Path.Combine(_env.WebRootPath, media.MediaUrl.TrimStart('/'));
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            _context.PlaceMedia.Remove(media);
+            await _context.SaveChangesAsync();
+
+            return Ok("Media deleted successfully");
+        }
     }
+
 }

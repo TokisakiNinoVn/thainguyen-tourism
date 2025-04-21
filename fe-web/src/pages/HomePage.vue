@@ -4,7 +4,7 @@
     <Navbar />
     <!-- Nội dung chính của trang Home -->
     <section class="main-content">
-      <h1 class="hello"> Chào mừng đến với Hệ Thống Quản Lý Khách Hàng của Bưu Điện tỉnh Thái Nguyên</h1>
+      <h1 class="hello">K</h1>
       
       <div class="banner">
         <img src="../assets/banner1.jpg" alt="Banner">

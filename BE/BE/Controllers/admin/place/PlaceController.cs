@@ -2,6 +2,7 @@ namespace BE.Controllers.admin.Location;
 
 using BE;
 using BE.Models;
+// using BE.Models.PlaceMedia;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -9,17 +10,21 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
-[Route("api/admin/place")]
 [ApiController]
+// [Authorize(Roles = "admin")]
+[Route("api/admin/place")]
 
 public class PlaceController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IWebHostEnvironment _env;
 
-    public PlaceController(AppDbContext context)
+    public PlaceController(AppDbContext context, IWebHostEnvironment env)
     {
         _context = context;
+        _env = env;
     }
 
     [HttpGet("list")]
@@ -50,6 +55,7 @@ public class PlaceController : ControllerBase
                 place.Latitude,
                 place.Longitude,
                 place.Thumbnail,
+                place.CreatedAt,
                 ImageUrl = imageUrl
             };
         }).ToList();
@@ -203,9 +209,9 @@ public class PlaceController : ControllerBase
         });
     }
     [HttpDelete("delete/{id}")]
-    public IActionResult DeletePlace(int id)
+    public async Task<IActionResult> DeletePlace(int id)
     {
-        var place = _context.Places.FirstOrDefault(p => p.Id == id);
+        var place = await _context.Places.FirstOrDefaultAsync(p => p.Id == id);
         if (place == null)
         {
             return NotFound(new
@@ -217,8 +223,40 @@ public class PlaceController : ControllerBase
             });
         }
 
+        // Xóa ảnh thumbnail nếu có
+        if (place.Thumbnail.HasValue)
+        {
+            var thumbnail = await _context.PlaceMedia.FirstOrDefaultAsync(pm => pm.Id == place.Thumbnail.Value);
+            if (thumbnail != null)
+            {
+                // Xóa file thumbnail khỏi server
+                var filePath = Path.Combine(_env.WebRootPath, thumbnail.MediaUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                _context.PlaceMedia.Remove(thumbnail);
+            }
+        }
+
+        // Xóa ảnh/video/audio/... khác nếu có
+        var mediaList = await _context.PlaceMedia.Where(pm => pm.PlaceId == id).ToListAsync();
+        foreach (var media in mediaList)
+        {
+            // Xóa file khỏi server
+            var filePath = Path.Combine(_env.WebRootPath, media.MediaUrl.TrimStart('/'));
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            _context.PlaceMedia.Remove(media);
+        }
+
+        // Xóa địa điểm
         _context.Places.Remove(place);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         return Ok(new
         {
@@ -228,6 +266,7 @@ public class PlaceController : ControllerBase
             data = (object?)null
         });
     }
+
     // Cập nhật thumbnail dựa vào id với id của ảnh thumbnail được truyền theo req body Thumbnail = 1
     // [HttpPost("update/thumbnail/{id}")]
     // public IActionResult UpdateThumbnail(int id, [FromBody] int thumbnailId)
@@ -267,7 +306,6 @@ public class PlaceController : ControllerBase
     //     });   
     // }
 
-    // Cập nhật thumbnail dựa vào id, ảnh thumbnail được truyền theo req body: thumbnailId = 1
     [HttpPost("update/thumbnail/{id}")]
     public IActionResult UpdateThumbnail(int id, [FromBody] int thumbnailId)
     {
@@ -283,16 +321,43 @@ public class PlaceController : ControllerBase
             });
         }
 
-        place.Thumbnail = thumbnailId;
-        _context.SaveChanges();
+        var newThumbnail = _context.PlaceMedia.FirstOrDefault(pm =>
+            pm.Id == thumbnailId &&
+            pm.PlaceId == id &&
+            pm.MediaType == 1 &&
+            pm.ImageFor == "thumbnail");
 
-        // Xóa ảnh cũ nếu có
-        var oldThumbnail = _context.PlaceMedia.FirstOrDefault(pm => pm.PlaceId == id && pm.MediaType == 1);
-        if (oldThumbnail != null)
+        if (newThumbnail == null)
         {
-            _context.PlaceMedia.Remove(oldThumbnail);
-            _context.SaveChanges();
+            return BadRequest(new
+            {
+                code = 400,
+                status = "error",
+                message = "Thumbnail mới không hợp lệ",
+                data = (object?)null
+            });
         }
+
+        // Xóa ảnh thumbnail cũ nếu khác với ảnh mới
+        if (place.Thumbnail != null && place.Thumbnail != thumbnailId)
+        {
+            var oldThumbnail = _context.PlaceMedia.FirstOrDefault(pm =>
+                pm.Id == place.Thumbnail &&
+                pm.PlaceId == id &&
+                pm.MediaType == 1 &&
+                pm.ImageFor == "thumbnail");
+
+            if (oldThumbnail != null)
+            {
+                _context.PlaceMedia.Remove(oldThumbnail);
+            }
+        }
+
+        // Gán thumbnail mới
+        place.Thumbnail = thumbnailId;
+        place.UpdatedAt = DateTime.UtcNow;
+
+        _context.SaveChanges();
 
         return Ok(new
         {
@@ -302,6 +367,7 @@ public class PlaceController : ControllerBase
             data = place
         });
     }
+
 
 
     // [HttpGet("search")]

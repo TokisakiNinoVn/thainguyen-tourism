@@ -17,7 +17,7 @@
                 <tr>
                   <th scope="col">Thumbnail</th>
                   <th scope="col">Tên</th>
-                  <th scope="col">Mô tả</th>
+                  <!-- <th scope="col">Mô tả</th> -->
                   <th scope="col">Kinh độ</th>
                   <th scope="col">Vĩ độ</th>
                   <th scope="col">Ngày tạo</th>
@@ -28,32 +28,55 @@
                 <tr v-for="place in placeList" :key="place.id">
                   <!-- <td>{{ place.id }}</td> -->
                   <td >{{ place.thumnail }}
-                    <img v-if="place.thumnail !== undefined && place.thumnail !== null"
+                    <!-- <img v-if="isInteger(place.thumnail) || place.thumnail !== undefined && place.thumnail !== null"
                       :src="instance.defaults.baseURL + place.thumnail"
                       alt="Thumbnail"
                       class="img-thumbnail"
                       style="width: 100px; height: 100px;"
+                    /> -->
+                    <img 
+                      v-if="place.thumbnail !== null && !Number.isInteger(place.thumnail)"
+                      :src="instance.defaults.baseURL + place.imageUrl"
+                      alt="Thumbnail"
+                      class="img-thumbnail"
+                      style="width: 100px; height: 100px;"
                     />
-                    <span v-else>
-                      <img
+
+                    <img v-else
                         src="https://i.pinimg.com/736x/3e/06/e4/3e06e4b2d23bc6084986ca2804954f3c.jpg"
                         alt="Placeholder"
                         class="img-thumbnail"
                         style="width: 100px;"
                       />
-                    </span>
+                    <!-- <img 
+                      v-if="!Number.isInteger(place.thumnail)"
+                      :src="instance.defaults.baseURL + place.imageUrl"
+                      alt="Thumbnail"
+                      class="img-thumbnail"
+                      style="width: 100px; height: 100px;"
+                    />
+
+                    <img v-else-if="place.thumnail === null || place.thumnail === undefined"
+                        src="https://i.pinimg.com/736x/3e/06/e4/3e06e4b2d23bc6084986ca2804954f3c.jpg"
+                        alt="Placeholder"
+                        class="img-thumbnail"
+                        style="width: 100px;"
+                      /> -->
+                    <!-- </img> -->
                   </td>
                   <td>{{ place.name }}</td>
-                  <td>{{ place.description }}</td>
+                  <!-- <td>{{ place.description }}</td> -->
                   <td>{{ place.longitude }}</td>
                   <td>{{ place.latitude }}</td>
                   <td>{{ formatDate(place.createdAt) }}</td>
                   <td>
                     <button
                       class="btn btn-sm btn-primary me-2"
-                      @click="goToEdit(place.id)"
                     >
-                      Sửa
+                      <router-link :to="`/places/edit/${place.id}`">
+                        <i class="fas fa-edit"></i>
+                        Sửa
+                      </router-link>
                     </button>
                     <button
                       class="btn btn-sm btn-danger me-2"
@@ -63,9 +86,13 @@
                     </button>
                     <button
                       class="btn btn-sm btn-success"
-                      @click="goToAddMedia(place.id)"
-                    >
-                      Thêm phương tiện
+                      >
+                      <!-- @click="goToAddMedia(place.id)" -->
+                      <router-link :to="`/places/media/${place.id}`">
+                        <i class="fas fa-plus"></i>
+                        Thêm phương tiện
+                      </router-link>
+                      <!-- Thêm phương tiện -->
                     </button>
                   </td>
                 </tr>
@@ -122,14 +149,18 @@
 
 <script setup>
 import { getListPlaceApi, deletePlaceApi } from '@/apis/modules/place.api';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import * as bootstrap from 'bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css'; 
+// import core-js/core/number
+
 import instance from '@/apis/axiosConfig';
+// import { isInteger } from 'core-js';
 
 const placeList = ref([]);
 const placeIdToDelete = ref(null);
-const router = useRouter();
+// const router = useRouter();
 
 const getListPlace = async () => {
   try {
@@ -153,13 +184,13 @@ const formatDate = (dateString) => {
   });
 };
 
-const goToEdit = (placeId) => {
-  router.push(`/places/edit/${placeId}`);
-};
+// const goToEdit = (placeId) => {
+//   router.push(`/places/edit/${placeId}`);
+// };
 
-const goToAddMedia = (placeId) => {
-  router.push(`/places/${placeId}/media/add`);
-};
+// const goToAddMedia = (placeId) => {
+//   router.push(`/places/${placeId}/media/add`);
+// };
 
 const confirmDelete = (placeId) => {
   placeIdToDelete.value = placeId;

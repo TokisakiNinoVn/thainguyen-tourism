@@ -4,6 +4,7 @@ import Dashboard from "../views/Dashboard.vue";
 import ManagementPlace from "@/views/place/ManagementPlace.vue";
 import AddPlace from "@/views/place/AddPlace.vue";
 import UpdatePlace from "@/views/place/UpdatePlace.vue";
+import ManagementMediaPlace from "@/views/place/UpdatePlaceMedia.vue";
 
 import Billing from "../views/Billing.vue";
 import VirtualReality from "../views/VirtualReality.vue";
@@ -20,6 +21,7 @@ const routes = [
   { path: "/management-place", name: "ManagementPlace", component: ManagementPlace, meta: { requiresAuth: true } },
   { path: "/add-place", name: "Thêm địa điểm", component: AddPlace, meta: { requiresAuth: true } },
   { path: "/places/edit/:id", name: "Sửa thông tin địa điểm", component: UpdatePlace, meta: { requiresAuth: true } },
+  { path: "/places/media/:id", name: "Files", component: ManagementMediaPlace, meta: { requiresAuth: true } },
 
 
   { path: "/billing", name: "Billing", component: Billing, meta: { requiresAuth: true } },

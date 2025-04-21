@@ -41,11 +41,11 @@
                     @click="highlightLocation(location)"
                   >
                     <div class="location-info">
-                      <img :src="instance.defaults.baseURL + location.imageUrl" alt="Thumbnail" class="img-thumbnail" />
+                      <img v-if="Number.isInteger(location.thumbnail) && location.thumbnail !== null" :src="instance.defaults.baseURL + location.imageUrl" alt="Thumbnail" class="object-cover img-thumbnail" />
+                      <img v-else src="https://i.pinimg.com/736x/76/9b/1c/769b1c69a615e8a1e8c71ab61b83258a.jpg" alt="Thumbnail" class="object-cover img-thumbnail " />
                       <div class="more-infor-place">
-                        <h6>{{ location.name }}</h6>
-                        <p>{{ location.description || 'Không có mô tả' }}</p>
-                        <small>Tọa độ: {{ location.coords.join(', ') }}</small>
+                        <h6 :title="location.name">{{ location.name }}</h6>
+                        <small>📍{{ location.coords.join(', ') }}</small>
                       </div>
                     </div>
                   </button>
@@ -78,14 +78,14 @@
               <label>Tên địa điểm</label>
               <input v-model="newLocation.name" type="text" placeholder="Nhập tên địa điểm" required />
             </div>
-            <div class="form-group">
-              <label>Mô tả</label>
+            <!-- <div class="form-group">
+              <label>Mô tả</label>object-cover 
               <textarea v-model="newLocation.description" placeholder="Nhập mô tả"></textarea>
-            </div>
-            <div class="form-group">
+            </div> -->
+            <!-- <div class="form-group">
               <label>Đường dẫn</label>
               <input v-model="newLocation.url" type="url" placeholder="Nhập URL" required />
-            </div>
+            </div> -->
           </div>
           <div class="modal-footer">
             <button class="btn btn-success" @click="saveLocation">
@@ -248,6 +248,7 @@ const loadLocations = async () => {
         coords: [place.latitude, place.longitude],
         url: place.thumbnail || '',
         thumbnail: place.thumbnail || 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg',
+        imageUrl: place.imageUrl || 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg',
       }));
       locations.value.forEach((location) => addMarker(location));
     }
@@ -257,6 +258,13 @@ const loadLocations = async () => {
   }
 };
 
+const chechThumbnail = (thumbnail, imageUrl) => {
+  if (Number.isInteger(thumbnail) && thumbnail !== null) {
+    return instance.defaults.baseURL + imageUrl;
+  }
+  return 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg';
+};
+
 // Thêm marker vào bản đồ
 const addMarker = (location) => {
   if (!map.value) return;
@@ -264,7 +272,7 @@ const addMarker = (location) => {
     className: 'custom-marker',
     html: `
       <div class="marker-wrapper">
-        <img src="${location.thumbnail}" 
+        <img  src="${chechThumbnail(location.thumbnail, location.imageUrl)}" 
             class="marker-image" 
             style="width: 40px; 
                     height: 40px; 
@@ -284,7 +292,9 @@ const addMarker = (location) => {
     popupAnchor: [0, -40],
   });
   const marker = L.marker(location.coords, { icon: customIcon }).addTo(map.value);
-  marker.bindPopup(`<b>${location.name}</b><br>${location.description || 'Không có mô tả'}`);
+  marker.bindPopup(`<b>${location.name}</b><br>📍${location.coords.join(', ')}`);
+  // marker.bindPopup(`<br><b>${location.coords.join(', ')}</b>`);
+  // marker.bindPopup(`<b>${location.name}</b><br>${location.description || 'Không có mô tả'}`);
   marker.on('mouseover', () => marker.openPopup());
   marker.on('mouseout', () => marker.closePopup());
   marker.on('click', () => {
@@ -328,8 +338,9 @@ const pasteCoords = async (field) => {
 
 // Lưu địa điểm
 const saveLocation = async () => {
-  if (!newLocation.value.name || !newLocation.value.url || !newLocation.value.latitude || !newLocation.value.longitude) {
-    alert('Vui lòng nhập đầy đủ tên, đường dẫn và tọa độ.');
+  // if (!newLocation.value.name || !newLocation.value.url || !newLocation.value.latitude || !newLocation.value.longitude) {
+  if (!newLocation.value.name || !newLocation.value.latitude || !newLocation.value.longitude) {
+    alert('Vui lòng nhập đầy đủ tên và tọa độ.');
     return;
   }
   try {
@@ -572,8 +583,10 @@ onMounted(() => {
 }
 .img-thumbnail {
   width: 100px;
+  height: 100px;
   border-radius: 50%;
   margin-right: 10px;
+  object-fit: cover;
 }
 
 .location-info h6 {

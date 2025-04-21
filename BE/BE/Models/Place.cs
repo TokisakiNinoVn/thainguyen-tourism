@@ -5,7 +5,7 @@
 //     Description TEXT,
 //     Latitude DOUBLE,
 //     Longitude DOUBLE,
-//     Thumbnail VARCHAR(255),
+//     Thumbnail VARCHAR(255), //     -- Thumbnail is an ID of the image in the table PlaceMedia
 //     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 //     UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 // );
