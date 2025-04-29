@@ -41,6 +41,7 @@ const getRoute = () => {
         </sidenav-item>
       </li>
       
+      
       <li class="nav-item">
         <sidenav-item
           to="/management-place"
@@ -49,6 +50,19 @@ const getRoute = () => {
         >
           <template v-slot:icon>
             <i class="ni ni-pin-3 text-warning text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+
+      <li class="nav-item">
+        <sidenav-item
+          to="/add-place"
+          :class="getRoute() === 'tables' ? 'active' : ''"
+          navText="Quản lý bài viết"
+        >
+          <template v-slot:icon>
+            <!-- <i class="ni ni-pin-3 text-warning text-sm opacity-10"></i> -->
+            <i class="fa-solid fa-file text-warning text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>

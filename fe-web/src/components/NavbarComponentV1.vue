@@ -16,10 +16,10 @@
       <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Địa điểm</router-link>
     </nav>
     <nav class="flex items-center gap-6">
-      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Lieên heêệ</router-link>
+      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Blogs</router-link>
     </nav>
     <nav class="flex items-center gap-6">
-      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Khacác</router-link>
+      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Khác</router-link>
     </nav>
 
     <!-- Auth Buttons -->

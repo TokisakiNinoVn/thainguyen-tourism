@@ -140,10 +140,10 @@ app.UseDeveloperExceptionPage();
 app.UseExceptionHandler("/error");
 
 // app.UseStaticFiles();
-app.UseCors();
+
 var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
 contentTypeProvider.Mappings[".geojson"] = "application/geo+json";
-
+app.UseCors();
 app.UseStaticFiles(new StaticFileOptions
 {
     ContentTypeProvider = contentTypeProvider

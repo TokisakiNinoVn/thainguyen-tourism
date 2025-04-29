@@ -22,5 +22,6 @@ public class AppDbContext : DbContext
 
     public DbSet<Place> Places { get; set; }
     public DbSet<PlaceMedia> PlaceMedia { get; set; }
+    public DbSet<Blog> Blogs { get; set; }
 }
 
