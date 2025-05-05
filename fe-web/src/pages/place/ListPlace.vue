@@ -58,7 +58,6 @@ const getListPlace = async () => {
     try {
         const response = await getListPlaceApi();
         listPlace.value = response.data.data;
-        console.log('List of places:', listPlace.value);
     } catch (error) {
     console.error('Error fetching list of places:', error);
     }

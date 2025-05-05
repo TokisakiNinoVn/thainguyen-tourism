@@ -5,6 +5,7 @@ import ManagementPlace from "@/views/place/ManagementPlace.vue";
 import AddPlace from "@/views/place/AddPlace.vue";
 import UpdatePlace from "@/views/place/UpdatePlace.vue";
 import ManagementMediaPlace from "@/views/place/UpdatePlaceMedia.vue";
+import ManagementReview from "@/views/review/ManagementReview.vue";
 
 import Billing from "../views/Billing.vue";
 import VirtualReality from "../views/VirtualReality.vue";
@@ -25,6 +26,9 @@ const routes = [
 
 
   { path: "/billing", name: "Billing", component: Billing, meta: { requiresAuth: true } },
+
+  { path: "/review", name: "Billing", component: ManagementReview, meta: { requiresAuth: true } },
+
   { path: "/virtual-reality", name: "Virtual Reality", component: VirtualReality, meta: { requiresAuth: true } },
   // { path: "/rtl-page", name: "RTL", component: RTL, meta: { requiresAuth: true } },
   { path: "/profile", name: "Profile", component: Profile, meta: { requiresAuth: true } },

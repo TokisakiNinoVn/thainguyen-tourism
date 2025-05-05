@@ -36,7 +36,8 @@ const getRoute = () => {
           navText="Thêm địa điểm"
         >
           <template v-slot:icon>
-            <i class="ni ni-pin-3 text-warning text-sm opacity-10"></i>
+            <!-- <i class="ni ni-pin-3"></i> -->
+            <i class="fa-solid fa-location-crosshairs  text-warning text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>
@@ -61,8 +62,19 @@ const getRoute = () => {
           navText="Quản lý bài viết"
         >
           <template v-slot:icon>
-            <!-- <i class="ni ni-pin-3 text-warning text-sm opacity-10"></i> -->
             <i class="fa-solid fa-file text-warning text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+      <li class="nav-item">
+        <sidenav-item
+          to="/review"
+          :class="getRoute() === 'tables' ? 'active' : ''"
+          navText="Quản lý Đánh giá"
+        >
+          <template v-slot:icon>
+            <!-- <i class="fa-solid fa-file text-warning text-sm opacity-10"></i> -->
+            <i class="fa-solid fa-comment text-warning text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>
@@ -79,11 +91,11 @@ const getRoute = () => {
         </sidenav-item>
       </li>
 
-      <li class="mt-3 nav-item">
+      <!-- <li class="mt-3 nav-item">
         <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
           TÀI KHOẢN
         </h6>
-      </li>
+      </li> -->
 
       <li class="nav-item">
         <sidenav-item

@@ -58,10 +58,76 @@ CREATE TABLE IF NOT EXISTS `blogs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.blogs: ~0 rows (approximately)
+-- Dumping data for table nhhoang.blogs: ~2 rows (approximately)
 INSERT INTO `blogs` (`id`, `title`, `content`, `status`, `authorId`, `thumbnail`, `createdAt`, `updatedAt`) VALUES
 	(1, 'string', 'string', 'string', 0, 0, '2025-04-28 18:06:05', '2025-04-28 18:06:05'),
 	(2, 'string', 'string', 'draft', 0, 0, '2025-04-28 20:42:12', '2025-04-28 20:42:12');
+
+-- Dumping structure for table nhhoang.chatdata
+CREATE TABLE IF NOT EXISTS `chatdata` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int DEFAULT NULL,
+  `content` varchar(2000) NOT NULL,
+  `type` varchar(50) NOT NULL COMMENT 'request/response',
+  `responseChatId` int DEFAULT NULL,
+  `createdAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table nhhoang.chatdata: ~42 rows (approximately)
+INSERT INTO `chatdata` (`id`, `userId`, `content`, `type`, `responseChatId`, `createdAt`) VALUES
+	(1, 1, 'Hi! chatbot - Hết token', 'request', NULL, '2025-05-02 09:35:05'),
+	(34, 1, 'Hi! chatbot - Hết token', 'request', NULL, '2025-05-02 09:35:05'),
+	(35, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 34, '2025-05-02 09:35:05'),
+	(36, 1, 'Hi! chatbot - Hết token', 'request', NULL, '2025-05-02 09:36:18'),
+	(37, 1, 'Không có phản hồi.', 'response', 36, '2025-05-02 09:36:20'),
+	(38, 1, 'Hi!', 'request', NULL, '2025-05-02 09:38:30'),
+	(39, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 38, '2025-05-02 09:38:30'),
+	(40, 1, 'Hi!', 'request', NULL, '2025-05-02 09:43:04'),
+	(41, 1, 'Hi!', 'request', NULL, '2025-05-02 09:43:43'),
+	(42, 1, 'Xin lỗi, tôi không thể hiểu yêu cầu của bạn! Mô hình của tôi không đủ thông minh để xử lý yêu cầu này.', 'response', 41, '2025-05-02 09:43:45'),
+	(43, 1, 'Hi!', 'request', NULL, '2025-05-02 09:44:40'),
+	(44, 1, 'Xin lỗi, tôi không thể hiểu yêu cầu của bạn! Mô hình của tôi không đủ thông minh để xử lý yêu cầu này.', 'response', 43, '2025-05-02 09:44:43'),
+	(45, 1, 'Hi!', 'request', NULL, '2025-05-02 09:45:29'),
+	(46, 1, 'Xin lỗi, tôi không thể hiểu yêu cầu của bạn! Mô hình của tôi không đủ thông minh để xử lý yêu cầu này.', 'response', 45, '2025-05-02 09:45:31'),
+	(47, 1, 'Hi!', 'request', NULL, '2025-05-02 09:46:58'),
+	(48, 1, ' I am a new mom and my baby is just turning 8 months old. You have been a huge help in our lives since we welcomed your family to the world. Please accept this card as a symbol of gratitude for all that you have done so far', 'response', 47, '2025-05-02 09:47:03'),
+	(52, 1, 'Halooo', 'request', NULL, '2025-05-03 02:42:33'),
+	(53, 1, '! Welcome to my channel', 'response', 52, '2025-05-03 02:42:36'),
+	(54, 1, 'Thủ đô Việt Nam', 'request', NULL, '2025-05-03 02:43:37'),
+	(55, 1, ' là Sài Gòn (tên tiếng Pháp là Ho Chi Minh City). Đây cũng là một trong những thành phố lớn nhất và chìm trong màu sắc, âm nhạc của văn hóa Việt Nam', 'response', 54, '2025-05-03 02:43:41'),
+	(56, 1, '1 ngày có bao nhiêu giờ', 'request', NULL, '2025-05-03 02:48:22'),
+	(57, 1, 'Hihi', 'response', 56, '2025-05-03 02:48:25'),
+	(58, 1, '1 Ngày có bao nhiêu giờ?', 'request', NULL, '2025-05-03 02:51:52'),
+	(59, 1, ' 3:00 - 5:30 sáng, 17h45 - 21:30 chiều', 'response', 58, '2025-05-03 02:51:55'),
+	(60, 1, '100/2=?', 'request', NULL, '2025-05-03 02:52:44'),
+	(61, 1, 'Xin lỗi, tôi không thể hiểu yêu cầu của bạn! Mô hình của tôi không đủ thông minh để xử lý yêu cầu này.', 'response', 60, '2025-05-03 02:52:47'),
+	(62, 1, '1 tuần có mấy thứ?', 'request', NULL, '2025-05-03 02:53:17'),
+	(63, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 62, '2025-05-03 02:53:17'),
+	(64, 1, 'Nino', 'request', NULL, '2025-05-03 02:55:03'),
+	(65, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 64, '2025-05-03 02:55:03'),
+	(66, 1, 'ădwa', 'request', NULL, '2025-05-03 02:59:29'),
+	(67, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 66, '2025-05-03 02:59:29'),
+	(68, 1, 'hii', 'request', NULL, '2025-05-03 03:02:58'),
+	(69, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 68, '2025-05-03 03:02:58'),
+	(70, 1, 'wadjwh', 'request', NULL, '2025-05-03 03:03:07'),
+	(71, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 70, '2025-05-03 03:03:07'),
+	(72, 1, '5+2', 'request', NULL, '2025-05-03 03:08:45'),
+	(73, 1, ' = 7', 'response', 72, '2025-05-03 03:08:49'),
+	(74, 1, 'B52 là gì/', 'request', NULL, '2025-05-03 03:09:08'),
+	(75, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 74, '2025-05-03 03:09:08'),
+	(76, 5, 'Có tổng bao nhiêu quốc gia', 'request', NULL, '2025-05-04 00:44:26'),
+	(77, 5, ' ở châu Phi', 'response', 76, '2025-05-04 00:44:34');
+
+-- Dumping structure for table nhhoang.likesplace
+CREATE TABLE IF NOT EXISTS `likesplace` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int NOT NULL DEFAULT '0',
+  `placeId` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table nhhoang.likesplace: ~0 rows (approximately)
 
 -- Dumping structure for table nhhoang.placemedia
 CREATE TABLE IF NOT EXISTS `placemedia` (
@@ -75,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `placemedia` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=260 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.placemedia: ~4 rows (approximately)
+-- Dumping data for table nhhoang.placemedia: ~6 rows (approximately)
 INSERT INTO `placemedia` (`id`, `placeId`, `mediaUrl`, `mediaType`, `createdAt`, `updatedAt`, `imageFor`) VALUES
 	(246, 18, '/uploads/3f1ca35d-cd30-4f3a-81c6-5dab874bbada.png', 1, '2025-04-21 08:51:41', '2025-04-21 08:51:41', 'thumbnail'),
 	(251, 18, '/uploads/7ad224a4-67b4-4dca-85b3-ef7426ea01af.jpg', 1, '2025-04-21 09:12:55', '2025-04-21 09:12:55', 'place-media'),
@@ -120,16 +186,21 @@ CREATE TABLE IF NOT EXISTS `reviewmedia` (
 -- Dumping structure for table nhhoang.reviews
 CREATE TABLE IF NOT EXISTS `reviews` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `place_id` int DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  `rating` float DEFAULT NULL,
-  `review_description` varchar(100) DEFAULT NULL,
+  `placeId` int DEFAULT NULL,
+  `userId` int DEFAULT NULL,
+  `rating` int DEFAULT NULL,
+  `reviewDescription` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `status` int DEFAULT '0',
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.reviews: ~0 rows (approximately)
+-- Dumping data for table nhhoang.reviews: ~3 rows (approximately)
+INSERT INTO `reviews` (`id`, `placeId`, `userId`, `rating`, `reviewDescription`, `status`, `createdAt`, `updatedAt`) VALUES
+	(1, 18, 5, 5, 'q', 1, '2025-05-04 01:52:56', '2025-05-04 01:52:56'),
+	(2, 18, 5, 5, 'Khak', 1, '2025-05-04 02:00:51', '2025-05-04 02:00:51'),
+	(3, 18, 5, 4, 'Địa điểm hay đấy, đáng để đi thử', 0, '2025-05-04 02:07:37', '2025-05-04 02:07:37');
 
 -- Dumping structure for table nhhoang.typemedia
 CREATE TABLE IF NOT EXISTS `typemedia` (
@@ -154,20 +225,21 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '0',
   `role` varchar(50) DEFAULT NULL,
   `photoURL` char(255) DEFAULT NULL,
-  `displayName` char(255) DEFAULT NULL,
+  `displayName` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'Người ẩn danh',
   `createdAt` datetime DEFAULT NULL,
   `isGoogleLogin` int DEFAULT NULL,
+  `tokenChat` int DEFAULT '10',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.users: ~4 rows (approximately)
-INSERT INTO `users` (`id`, `email`, `password`, `role`, `photoURL`, `displayName`, `createdAt`, `isGoogleLogin`) VALUES
-	(1, 'nino@gmail.com', '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'admin', NULL, NULL, '2025-04-09 21:51:11', 0),
-	(2, 'ninoi@gmail.com', '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'user', NULL, NULL, '2025-04-09 21:55:05', 1),
-	(3, NULL, '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'admin', NULL, NULL, '2025-04-09 21:55:09', 1),
-	(4, NULL, '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'admin', NULL, NULL, '2025-04-09 21:55:10', 1),
-	(5, 'trieuduytancbg@gmail.com', '__google_login__', 'user', 'https://lh3.googleusercontent.com/a/ACg8ocLqPUyILLftHgI8uvflx7GvZEe5JQ3tTAn1sE7EteRsFa2vBcnU=s96-c', 'Tokisaki Nino', '2025-04-10 01:09:00', 1),
-	(6, 'tongduytan.ego@gmail.com', '__google_login__', 'user', 'https://lh3.googleusercontent.com/a/ACg8ocJefq2VBO8QWyUA2gBK2fVwIe6RzqV4AwAwetLDgsjKtURzZA=s96-c', 'Tokisaki Nino', '2025-04-21 07:46:22', 1);
+-- Dumping data for table nhhoang.users: ~6 rows (approximately)
+INSERT INTO `users` (`id`, `email`, `password`, `role`, `photoURL`, `displayName`, `createdAt`, `isGoogleLogin`, `tokenChat`) VALUES
+	(1, 'nino@gmail.com', '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'admin', NULL, 'Bí khách ẩn danh', '2025-04-09 21:51:11', 0, 0),
+	(2, 'ninoi@gmail.com', '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'user', NULL, 'Bí khách ẩn danh', '2025-04-09 21:55:05', 1, 10),
+	(3, NULL, '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'admin', NULL, 'Bí khách ẩn danh', '2025-04-09 21:55:09', 1, 10),
+	(4, NULL, '$2b$10$1NfXyAgF5M9EJt5s/r6gneC2DUEiKjoJ.m1ETaZciIpwRQ5K2qHlW', 'admin', NULL, 'Bí khách ẩn danh', '2025-04-09 21:55:10', 1, 10),
+	(5, 'trieuduytancbg@gmail.com', '__google_login__', 'user', 'https://lh3.googleusercontent.com/a/ACg8ocLqPUyILLftHgI8uvflx7GvZEe5JQ3tTAn1sE7EteRsFa2vBcnU=s96-c', 'Tokisaki Nino', '2025-04-10 01:09:00', 1, 9),
+	(6, 'tongduytan.ego@gmail.com', '__google_login__', 'user', 'https://lh3.googleusercontent.com/a/ACg8ocJefq2VBO8QWyUA2gBK2fVwIe6RzqV4AwAwetLDgsjKtURzZA=s96-c', 'Tokisaki Nino', '2025-04-21 07:46:22', 1, 10);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

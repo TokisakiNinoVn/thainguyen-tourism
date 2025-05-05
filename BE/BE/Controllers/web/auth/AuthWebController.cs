@@ -62,7 +62,7 @@ public class AuthWebController : ControllerBase
             });
 
         // ===== Lấy JWT config =====
-        var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") 
+        var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
                     ?? throw new InvalidOperationException("JWT_KEY is not configured.");
         var key = Encoding.UTF8.GetBytes(jwtKey);
         var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
@@ -148,8 +148,8 @@ public class AuthWebController : ControllerBase
     }
 
     // POST: api/AuthWeb/google-login
-    [HttpPost("google-login")]
-    public async Task<IActionResult> GoogleLogin([FromBody] GoogleUserRequest model)
+    [HttpPost("first-google-login")]
+    public async Task<IActionResult> FirstGoogleLogin([FromBody] GoogleUserRequest model)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
 
@@ -173,6 +173,66 @@ public class AuthWebController : ControllerBase
 
         return Ok(new { message = "Đăng nhập bằng Google thành công", data = user });
     }
+
+    // // POST: api/AuthWeb/google-login
+    // [HttpPost("google-login")]
+    // public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest model)
+    // {
+    //     var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+    //     if (user == null)
+    //         return BadRequest(new { message = "Người dùng không tồn tại" });
+
+    //     if (user.IsGoogleLogin != 1)
+    //         return BadRequest(new { message = "Người dùng không đăng nhập bằng Google" });
+    //     // Tạo JWT token cho người dùng đã đăng nhập bằng Google
+    //     var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new InvalidOperationException("JWT_KEY is not configured.");
+    //     var key = Encoding.UTF8.GetBytes(jwtKey);
+    //     var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+    //     var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+    //     var expiration = TimeSpan.FromHours(3);
+
+    //     if (_config["JWT_EXPIRATION"]?.EndsWith("h") == true)
+    //     {
+    //         if (int.TryParse(_config["JWT_EXPIRATION"]![..^1], out var hours))
+    //             expiration = TimeSpan.FromHours(hours);
+    //     }
+
+    //     // ===== Tạo JWT token =====
+    //     var tokenHandler = new JwtSecurityTokenHandler();
+    //     var tokenDescriptor = new SecurityTokenDescriptor
+    //     {
+    //         Subject = new ClaimsIdentity(new[]
+    //         {
+    //             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    //             new Claim(ClaimTypes.Email, user.Email),
+    //             new Claim(ClaimTypes.Role, user.Role ?? "user")
+    //         }),
+    //         Expires = DateTime.UtcNow.Add(expiration),
+    //         Issuer = issuer,
+    //         Audience = audience,
+    //         SigningCredentials = new SigningCredentials(
+    //             new SymmetricSecurityKey(key),
+    //             SecurityAlgorithms.HmacSha256
+    //         )
+    //     };
+
+    //     var token = tokenHandler.CreateToken(tokenDescriptor);
+    //     var tokenString = tokenHandler.WriteToken(token);
+
+    //     // ===== Trả về response gọn gàng =====
+    //     return Ok(new
+    //     {
+    //         code = 200,
+    //         status = "success",
+    //         message = "Đăng nhập thành công",
+    //         data = new
+    //         {
+    //             token = tokenString,
+    //             // role = user.Role
+    //         }
+    //     });
+    // }
 
     // ==== Models nội bộ ====
     public class LoginRequest
@@ -198,5 +258,10 @@ public class AuthWebController : ControllerBase
         public required string Email { get; set; }
         public required string Name { get; set; }
         public required string Avatar { get; set; }
+    }
+
+    public class GoogleLoginRequest
+    {
+        public required string Email { get; set; }
     }
 }

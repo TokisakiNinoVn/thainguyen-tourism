@@ -17,7 +17,7 @@ builder.Services.AddSwaggerGen();
 
 // ======= Load biến môi trường từ .env =======
 DotNetEnv.Env.Load();
-Console.WriteLine($"JWT_KEY: {Environment.GetEnvironmentVariable("JWT_KEY")}");
+// Console.WriteLine($"JWT_KEY: {Environment.GetEnvironmentVariable("JWT_KEY")}");
 
 // ======= Đọc JWT từ biến môi trường và kiểm tra null =======
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");

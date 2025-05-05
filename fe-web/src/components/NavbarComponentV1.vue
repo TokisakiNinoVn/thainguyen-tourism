@@ -16,14 +16,23 @@
       <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Địa điểm</router-link>
     </nav>
     <nav class="flex items-center gap-6">
+      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Giới thiệu</router-link>
+    </nav>
+    <nav class="flex items-center gap-6">
       <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Blogs</router-link>
     </nav>
     <nav class="flex items-center gap-6">
-      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Khác</router-link>
+      <router-link to="/chat" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Chatbot</router-link>
+    </nav>
+    <nav class="flex items-center gap-6">
+      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Liên hệ</router-link>
+    </nav>
+    <nav v-if="isLogin" class="flex items-center gap-6">
+      <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Tài khoản</router-link>
     </nav>
 
     <!-- Auth Buttons -->
-    <div class="flex items-center gap-4">
+    <div v-if="!isLogin" class="flex items-center gap-4">
       <router-link to="/login">
         <button class="text-green-600 font-normal text-[13.6px] px-4 py-2 rounded-full hover:bg-green-50">Log in</button>
       </router-link>
@@ -32,10 +41,8 @@
   </header>
 </template>
 
-<script>
-export default {
-  name: "NavbarComponentV1",
-};
+<script setup>
+  const isLogin = JSON.parse(localStorage.getItem('isLoggedIn')) || false;
 </script>
 
 <style scoped>

@@ -56,7 +56,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { login, saveInformation } from '@/services/modules/auth.api';
+import {
+  login,
+  saveInformation,
+  loginGoogleApi, // Dùng gmail để lấy token
+} from '@/services/modules/auth.api';
 import { auth, provider, signInWithPopup } from '@/firebase';
 
 const email = ref('');
@@ -73,7 +77,8 @@ const handleLogin = async () => {
     const { data } = response.data;
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('user', JSON.stringify(data));
-
+    // save token to localStorage
+    localStorage.setItem('token', data.token);
     router.push('/');
   } catch (error) {
     console.error(error);
@@ -100,8 +105,11 @@ const handleGoogleLogin = async () => {
       await saveInformation(userData);
     }
 
-    // console.log('Google login result:', userData);
-
+    // Gửi gmail về server để lấy token
+    const response = await loginGoogleApi({ email: user.email });
+    const { data } = response.data;
+    // Lưu token vào localStorage
+    localStorage.setItem('token', data.token);
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('user', JSON.stringify(userData));
 

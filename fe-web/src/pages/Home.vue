@@ -1,7 +1,7 @@
 <template>
     <div id="app">
       <!-- Header -->
-      <h1>Welcome to Our Website: Haloo</h1>
+      <h1>✌️Chào mừng bạn đến với website du lịch  tỉnh Thái Nguyên!</h1>
       <NavbarComponentV1 />
 
       <!-- Banner page -->

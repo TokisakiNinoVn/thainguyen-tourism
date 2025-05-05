@@ -15,6 +15,8 @@ import BlankPage from '@/pages/BlankPage.vue';
 
 import ListPlace from '@/pages/place/ListPlace.vue';
 import DetailsPlace from '@/pages/place/DetailsPlace.vue';
+import ChatPage from '@/pages/chat/ChatPage.vue';
+
 
 const routes = [
   { path: '/', component: Home },
@@ -31,6 +33,7 @@ const routes = [
   // { path: '/create-order', component: OrderCreate },
 
   { path: '/home', component: HomePage, meta: { requiresAuth: true } },
+  { path: '/chat', component: ChatPage, meta: { requiresAuth: true } },
     
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
 ];
