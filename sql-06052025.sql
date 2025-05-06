@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `blogmedia` (
   `media_type` varchar(50) DEFAULT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
+  `status` int DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -58,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `blogs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.blogs: ~2 rows (approximately)
+-- Dumping data for table nhhoang.blogs: ~0 rows (approximately)
 INSERT INTO `blogs` (`id`, `title`, `content`, `status`, `authorId`, `thumbnail`, `createdAt`, `updatedAt`) VALUES
 	(1, 'string', 'string', 'string', 0, 0, '2025-04-28 18:06:05', '2025-04-28 18:06:05'),
 	(2, 'string', 'string', 'draft', 0, 0, '2025-04-28 20:42:12', '2025-04-28 20:42:12');
@@ -72,9 +73,9 @@ CREATE TABLE IF NOT EXISTS `chatdata` (
   `responseChatId` int DEFAULT NULL,
   `createdAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.chatdata: ~42 rows (approximately)
+-- Dumping data for table nhhoang.chatdata: ~46 rows (approximately)
 INSERT INTO `chatdata` (`id`, `userId`, `content`, `type`, `responseChatId`, `createdAt`) VALUES
 	(1, 1, 'Hi! chatbot - Hết token', 'request', NULL, '2025-05-02 09:35:05'),
 	(34, 1, 'Hi! chatbot - Hết token', 'request', NULL, '2025-05-02 09:35:05'),
@@ -117,7 +118,43 @@ INSERT INTO `chatdata` (`id`, `userId`, `content`, `type`, `responseChatId`, `cr
 	(74, 1, 'B52 là gì/', 'request', NULL, '2025-05-03 03:09:08'),
 	(75, 1, 'Bạn cần liên hệ admin nạp thêm token chat để sử dụng dịch vụ này.', 'response', 74, '2025-05-03 03:09:08'),
 	(76, 5, 'Có tổng bao nhiêu quốc gia', 'request', NULL, '2025-05-04 00:44:26'),
-	(77, 5, ' ở châu Phi', 'response', 76, '2025-05-04 00:44:34');
+	(77, 5, ' ở châu Phi', 'response', 76, '2025-05-04 00:44:34'),
+	(78, 1, 'Làm sao để đặt tour tham quan hồ Núi Cốc?', 'request', NULL, '2025-05-05 21:02:55'),
+	(79, 1, 'Bạn có thể đặt tour trực tiếp trên website hoặc để lại thông tin (ngày đi, số người), mình sẽ hỗ trợ bạn hoàn tất đặt tour đến Hồ Núi Cốc nhanh chóng!', 'response', 78, '2025-05-05 21:02:55'),
+	(80, 1, 'Làm sao để đặt tour tham quan hồ Núi Cốc?', 'request', NULL, '2025-05-05 21:05:46'),
+	(81, 1, 'Bạn có thể đặt tour trực tiếp trên website hoặc để lại thông tin (ngày đi, số người), mình sẽ hỗ trợ bạn hoàn tất đặt tour đến Hồ Núi Cốc nhanh chóng!', 'response', 80, '2025-05-05 21:05:46'),
+	(82, 1, 'Tôi muốn tìm hiểu về lịch sử ATK Định Hóa, chatbot có thể giúp không?', 'request', NULL, '2025-05-05 21:06:32'),
+	(83, 1, 'Tất nhiên rồi! ATK Định Hóa là căn cứ cách mạng quan trọng thời kháng chiến chống Pháp. Tại đây có Nhà tưởng niệm Bác Hồ, lán Khuôn Tát, và nhiều di tích lịch sử khác.', 'response', 82, '2025-05-05 21:06:32'),
+	(84, 1, ' Có lịch trình gợi ý cho chuyến đi 1 ngày ở Thái Nguyên không?', 'request', NULL, '2025-05-05 21:06:37'),
+	(85, 1, 'Gợi ý lịch trình 1 ngày:\n\nSáng: Tham quan đồi chè Tân Cương – trải nghiệm hái và pha trà.\n\nTrưa: Ăn đặc sản địa phương.\n\nChiều: Tham quan Hồ Núi Cốc – công viên nước – chụp ảnh check-in.\nBạn muốn mình gửi bản chi tiết kèm bản đồ không?', 'response', 84, '2025-05-05 21:06:37'),
+	(86, 1, 'Tôi muốn tìm hiểu về lịch sử ATK Định Hóa, chatbot có thể giúp không?', 'request', NULL, '2025-05-05 21:12:12'),
+	(87, 1, 'Tất nhiên rồi! ATK Định Hóa là căn cứ cách mạng quan trọng thời kháng chiến chống Pháp. Tại đây có Nhà tưởng niệm Bác Hồ, lán Khuôn Tát, và nhiều di tích lịch sử khác.', 'response', 86, '2025-05-05 21:12:12'),
+	(88, 1, ' Có lịch trình gợi ý cho chuyến đi 1 ngày ở Thái Nguyên không?', 'request', NULL, '2025-05-05 21:17:31'),
+	(89, 1, 'Gợi ý lịch trình 1 ngày:\n\nSáng: Tham quan đồi chè Tân Cương – trải nghiệm hái và pha trà.\n\nTrưa: Ăn đặc sản địa phương.\n\nChiều: Tham quan Hồ Núi Cốc – công viên nước – chụp ảnh check-in.\nBạn muốn mình gửi bản chi tiết kèm bản đồ không?', 'response', 88, '2025-05-05 21:17:31'),
+	(90, 1, 'Tôi muốn tìm hiểu về lịch sử ATK Định Hóa, chatbot có thể giúp không?', 'request', NULL, '2025-05-05 21:18:13'),
+	(91, 1, 'Tất nhiên rồi! ATK Định Hóa là căn cứ cách mạng quan trọng thời kháng chiến chống Pháp. Tại đây có Nhà tưởng niệm Bác Hồ, lán Khuôn Tát, và nhiều di tích lịch sử khác.', 'response', 90, '2025-05-05 21:18:13'),
+	(92, 1, ' Có khách sạn hoặc homestay nào gần đồi chè Tân Cương không?', 'request', NULL, '2025-05-05 21:19:00'),
+	(93, 1, 'Có nhiều lựa chọn như Tân Cương Green Homestay, Khách sạn Hoàng Mấm, hoặc các chỗ nghỉ nhỏ xinh gần đồi chè.', 'response', 92, '2025-05-05 21:19:00');
+
+-- Dumping structure for table nhhoang.chatdefault
+CREATE TABLE IF NOT EXISTS `chatdefault` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question` varchar(200) NOT NULL,
+  `answer` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table nhhoang.chatdefault: ~9 rows (approximately)
+INSERT INTO `chatdefault` (`id`, `question`, `answer`) VALUES
+	(1, 'Ở Thái Nguyên có những địa điểm du lịch nổi bật nào?', 'Thái Nguyên nổi tiếng với nhiều địa điểm hấp dẫn như Hồ Núi Cốc, Đồi chè Tân Cương, Khu di tích lịch sử ATK Định Hóa, chùa Hang, và bảo tàng các dân tộc Việt Nam.'),
+	(2, 'Làm sao để đặt tour tham quan hồ Núi Cốc?', 'Bạn có thể đặt tour trực tiếp trên website hoặc để lại thông tin (ngày đi, số người), mình sẽ hỗ trợ bạn hoàn tất đặt tour đến Hồ Núi Cốc nhanh chóng!'),
+	(3, 'Tôi có thể ăn đặc sản gì khi đến Thái Nguyên?', 'Một số đặc sản nổi tiếng bạn nên thử là cơm lam Định Hóa, bánh chưng Bờ Đậu, gà đồi nướng, canh cá rô và đặc biệt là trà Tân Cương. Mình có thể gợi ý địa điểm ăn uống gần chỗ bạn lưu trú.'),
+	(4, ' Có khách sạn hoặc homestay nào gần đồi chè Tân Cương không?', 'Có nhiều lựa chọn như Tân Cương Green Homestay, Khách sạn Hoàng Mấm, hoặc các chỗ nghỉ nhỏ xinh gần đồi chè.'),
+	(5, 'Chi phí du lịch Thái Nguyên trong 2 ngày khoảng bao nhiêu?', 'Chi phí dao động từ 800.000đ – 1.500.000đ/người tùy vào lịch trình, phương tiện di chuyển và chỗ ở.'),
+	(6, 'Tôi có thể đặt xe du lịch đi ATK Định Hóa qua chatbot không?', 'Hoàn toàn được! Bạn vui lòng cho mình biết thời gian đi, số lượng người và địa điểm đón – mình sẽ hỗ trợ đặt xe du lịch hoặc xe riêng tùy nhu cầu nhé!'),
+	(7, 'Có tour nào phù hợp cho gia đình có trẻ nhỏ không?', 'Có nhé! Tour Hồ Núi Cốc – Đồi chè – Vui chơi công viên nước rất phù hợp cho gia đình có trẻ em. Lịch trình nhẹ nhàng, an toàn và có nhiều hoạt động thú vị cho bé.'),
+	(8, ' Có lịch trình gợi ý cho chuyến đi 1 ngày ở Thái Nguyên không?', 'Gợi ý lịch trình 1 ngày:\n\nSáng: Tham quan đồi chè Tân Cương – trải nghiệm hái và pha trà.\n\nTrưa: Ăn đặc sản địa phương.\n\nChiều: Tham quan Hồ Núi Cốc – công viên nước – chụp ảnh check-in.\nBạn muốn mình gửi bản chi tiết kèm bản đồ không?'),
+	(9, 'Tôi muốn tìm hiểu về lịch sử ATK Định Hóa, chatbot có thể giúp không?', 'Tất nhiên rồi! ATK Định Hóa là căn cứ cách mạng quan trọng thời kháng chiến chống Pháp. Tại đây có Nhà tưởng niệm Bác Hồ, lán Khuôn Tát, và nhiều di tích lịch sử khác.');
 
 -- Dumping structure for table nhhoang.likesplace
 CREATE TABLE IF NOT EXISTS `likesplace` (
@@ -141,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `placemedia` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=260 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.placemedia: ~6 rows (approximately)
+-- Dumping data for table nhhoang.placemedia: ~5 rows (approximately)
 INSERT INTO `placemedia` (`id`, `placeId`, `mediaUrl`, `mediaType`, `createdAt`, `updatedAt`, `imageFor`) VALUES
 	(246, 18, '/uploads/3f1ca35d-cd30-4f3a-81c6-5dab874bbada.png', 1, '2025-04-21 08:51:41', '2025-04-21 08:51:41', 'thumbnail'),
 	(251, 18, '/uploads/7ad224a4-67b4-4dca-85b3-ef7426ea01af.jpg', 1, '2025-04-21 09:12:55', '2025-04-21 09:12:55', 'place-media'),
@@ -194,13 +231,14 @@ CREATE TABLE IF NOT EXISTS `reviews` (
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table nhhoang.reviews: ~3 rows (approximately)
+-- Dumping data for table nhhoang.reviews: ~4 rows (approximately)
 INSERT INTO `reviews` (`id`, `placeId`, `userId`, `rating`, `reviewDescription`, `status`, `createdAt`, `updatedAt`) VALUES
 	(1, 18, 5, 5, 'q', 1, '2025-05-04 01:52:56', '2025-05-04 01:52:56'),
 	(2, 18, 5, 5, 'Khak', 1, '2025-05-04 02:00:51', '2025-05-04 02:00:51'),
-	(3, 18, 5, 4, 'Địa điểm hay đấy, đáng để đi thử', 0, '2025-05-04 02:07:37', '2025-05-04 02:07:37');
+	(3, 18, 5, 4, 'Địa điểm hay đấy, đáng để đi thử', 0, '2025-05-04 02:07:37', '2025-05-04 02:07:37'),
+	(5, 18, 1, 5, '1000 điểm, nơi đáng để đi', 0, '2025-05-05 19:09:24', '2025-05-05 19:09:24');
 
 -- Dumping structure for table nhhoang.typemedia
 CREATE TABLE IF NOT EXISTS `typemedia` (
