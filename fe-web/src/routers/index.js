@@ -17,11 +17,12 @@ import ListPlace from '@/pages/place/ListPlace.vue';
 import DetailsPlace from '@/pages/place/DetailsPlace.vue';
 import DetailsPlaceMedia from '@/pages/place/DetailsPlaceMedia.vue';
 import ChatPage from '@/pages/chat/ChatPage.vue';
-
-
+import CreateBlog from '@/pages/blog/CreateBlog.vue';
 const routes = [
   { path: '/', component: Home },
   { path: '/blank', component: BlankPage },
+  { path: '/create-blog', component: CreateBlog, meta: { requiresAuth: true } },
+
   { path: '/login', component: Login },
   { path: '/places', component: ListPlace },
   { path: '/places/:id', component: DetailsPlace },

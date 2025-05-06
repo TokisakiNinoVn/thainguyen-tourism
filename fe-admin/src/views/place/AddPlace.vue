@@ -2,11 +2,17 @@
   <div class="card">
     <div class="card-header">
       <h6>Thêm địa điểm</h6>
+      <div class="province-selector">
+        <label for="province">Chọn tỉnh:</label>
+        <select id="province" v-model="selectedProvince" @change="switchProvince">
+          <option value="ThaiNguyen">Thái Nguyên</option>
+          <option value="BacKan">Bắc Kạn</option>
+        </select>
+      </div>
     </div>
     <div class="card-body">
       <div class="container-fluid">
         <div class="row">
-          <!-- Bản đồ bên trái -->
           <div class="col-md-8 map-section">
             <div class="map-container">
               <div id="map" ref="mapRef"></div>
@@ -17,7 +23,6 @@
               </div>
             </div>
           </div>
-          <!-- Danh sách địa điểm bên phải -->
           <div class="col-md-4 location-section">
             <div class="location-list">
               <div class="location-header">
@@ -42,7 +47,10 @@
                   >
                     <div class="location-info">
                       <img v-if="Number.isInteger(location.thumbnail) && location.thumbnail !== null" :src="instance.defaults.baseURL + location.imageUrl" alt="Thumbnail" class="object-cover img-thumbnail" />
-                      <img v-else src="https://i.pinimg.com/736x/76/9b/1c/769b1c69a615e8a1e8c71ab61b83258a.jpg" alt="Thumbnail" class="object-cover img-thumbnail " />
+                      <!-- <img v-else-if="location.thumbnail === null" src="https://i.pinimg.com/736x/76/9b/1c/769b1c69a615e8a1e8c71ab61b83258a.jpg" alt="Thumbnail" class="object-cover img-thumbnail" /> -->
+                      <img v-else src="https://i.pinimg.com/736x/76/9b/1c/769b1c69a615e8a1e8c71ab61b83258a.jpg" alt="Thumbnail" class="object-cover img-thumbnail" />
+                      <!-- <span>{{ location.thumbnail }}</span> -->
+                      
                       <div class="more-infor-place">
                         <h6 :title="location.name">{{ location.name }}</h6>
                         <small>📍{{ location.coords.join(', ') }}</small>
@@ -58,7 +66,6 @@
           </div>
         </div>
       </div>
-      <!-- Form thêm địa điểm bằng click -->
       <div class="modal" v-if="showForm">
         <div class="modal-content">
           <div class="modal-header">
@@ -78,14 +85,14 @@
               <label>Tên địa điểm</label>
               <input v-model="newLocation.name" type="text" placeholder="Nhập tên địa điểm" required />
             </div>
-            <!-- <div class="form-group">
-              <label>Mô tả</label>object-cover 
+            <div class="form-group">
+              <label>Mô tả</label>
               <textarea v-model="newLocation.description" placeholder="Nhập mô tả"></textarea>
-            </div> -->
-            <!-- <div class="form-group">
+            </div>
+            <div class="form-group">
               <label>Đường dẫn</label>
               <input v-model="newLocation.url" type="url" placeholder="Nhập URL" required />
-            </div> -->
+            </div>
           </div>
           <div class="modal-footer">
             <button class="btn btn-success" @click="saveLocation">
@@ -97,7 +104,6 @@
           </div>
         </div>
       </div>
-      <!-- Form thêm địa điểm bằng tọa độ -->
       <div class="modal" v-if="showCoordsForm">
         <div class="modal-content">
           <div class="modal-header">
@@ -142,7 +148,6 @@
           </div>
         </div>
       </div>
-      <!-- Popup thông tin -->
       <div class="info-panel" v-if="showInfo">
         <div class="info-header">
           <h5><i class="fas fa-info-circle"></i> {{ selectedLocation.name }}</h5>
@@ -169,19 +174,22 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { createPlaceApi, getListPlaceApi } from '@/apis/modules/place.api';
+import { createPlaceApi, getListPlaceProvinApi } from '@/apis/modules/place.api';
 import instance from '@/apis/axiosConfig';
 
-// Biến reactive
 const map = ref(null);
 const mapRef = ref(null);
-const thaiNguyenBounds = ref(null);
+const provinceBounds = ref(null);
 const locations = ref([]);
 const showForm = ref(false);
 const showCoordsForm = ref(false);
 const showInfo = ref(false);
 const tempLatLng = ref(null);
-const initialMapState = ref({ center: [21.6, 105.85], zoom: 10 });
+const selectedProvince = ref('ThaiNguyen');
+const provinceConfig = ref({
+  ThaiNguyen: { center: [21.6, 105.85], zoom: 10, geojson: 'ThaiNguyen.geojson', displayName: 'Thái Nguyên' },
+  BacKan: { center: [22.3, 105.85], zoom: 10, geojson: 'BacKan.geojson', displayName: 'Bắc Kạn' },
+});
 const newLocation = ref({
   name: '',
   description: '',
@@ -190,29 +198,38 @@ const newLocation = ref({
   longitude: null,
   coords: null,
   imageUrl: '',
+  province: 'ThaiNguyen',
 });
 const selectedLocation = ref(null);
 const markers = ref({});
+let currentGeoJSONLayer = null;
 
-// Khởi tạo bản đồ
 const initializeMap = () => {
   if (!mapRef.value) return;
+  const config = provinceConfig.value[selectedProvince.value];
   map.value = L.map(mapRef.value, {
-    center: initialMapState.value.center,
-    zoom: initialMapState.value.zoom,
+    center: config.center,
+    zoom: config.zoom,
     zoomAnimation: false,
   });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
   }).addTo(map.value);
+  loadGeoJSON();
+};
 
-  fetch(`${instance.defaults.baseURL}/files/ThaiNguyen.geojson`)
+const loadGeoJSON = () => {
+  const config = provinceConfig.value[selectedProvince.value];
+  if (currentGeoJSONLayer) {
+    map.value.removeLayer(currentGeoJSONLayer);
+  }
+  fetch(`${instance.defaults.baseURL}/files/${config.geojson}`)
     .then((response) => {
       if (!response.ok) throw new Error('Không tìm thấy GeoJSON');
       return response.json();
     })
     .then((data) => {
-      const thaiNguyenLayer = L.geoJSON(data, {
+      currentGeoJSONLayer = L.geoJSON(data, {
         style: {
           color: '#ff7800',
           weight: 2,
@@ -220,26 +237,38 @@ const initializeMap = () => {
           fillOpacity: 0.3,
         },
       }).addTo(map.value);
-      map.value.fitBounds(thaiNguyenLayer.getBounds());
-      thaiNguyenBounds.value = thaiNguyenLayer.getBounds();
+      map.value.fitBounds(currentGeoJSONLayer.getBounds());
+      provinceBounds.value = currentGeoJSONLayer.getBounds();
     })
     .catch((error) => {
       console.error('Lỗi khi tải GeoJSON:', error);
-      alert('Không thể tải bản đồ tỉnh Thái Nguyên.');
+      alert(`Không thể tải bản đồ tỉnh ${provinceConfig.value[selectedProvince.value].displayName}.`);
     });
 };
 
-// Reset bản đồ về trạng thái ban đầu
+const switchProvince = () => {
+  locations.value = [];
+  markers.value = {};
+  newLocation.value.province = selectedProvince.value;
+  if (map.value) {
+    map.value.off();
+    map.value.remove();
+  }
+  initializeMap();
+  loadLocations();
+};
+
 const resetMap = () => {
   if (map.value) {
-    map.value.setView(initialMapState.value.center, initialMapState.value.zoom, { animate: false });
+    const config = provinceConfig.value[selectedProvince.value];
+    map.value.setView(config.center, config.zoom, { animate: false });
   }
 };
 
-// Load danh sách địa điểm từ API
 const loadLocations = async () => {
   try {
-    const response = await getListPlaceApi();
+    const provinceDisplayName = provinceConfig.value[selectedProvince.value].displayName;
+    const response = await getListPlaceProvinApi(provinceDisplayName);
     if (response.code === 200) {
       locations.value = response.data.map((place) => ({
         id: place.id,
@@ -249,43 +278,43 @@ const loadLocations = async () => {
         url: place.thumbnail || '',
         thumbnail: place.thumbnail || 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg',
         imageUrl: place.imageUrl || 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg',
+        province: selectedProvince.value,
       }));
       locations.value.forEach((location) => addMarker(location));
     }
   } catch (error) {
     console.error('Lỗi khi tải danh sách địa điểm:', error);
-    alert('Không thể tải danh sách địa điểm.');
+    // alert('Không thể tải danh sách địa điểm.');
   }
 };
 
-const chechThumbnail = (thumbnail, imageUrl) => {
+const checkThumbnail = (thumbnail, imageUrl) => {
   if (Number.isInteger(thumbnail) && thumbnail !== null) {
     return instance.defaults.baseURL + imageUrl;
   }
   return 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg';
 };
 
-// Thêm marker vào bản đồ
 const addMarker = (location) => {
   if (!map.value) return;
   const customIcon = L.divIcon({
     className: 'custom-marker',
     html: `
       <div class="marker-wrapper">
-        <img  src="${chechThumbnail(location.thumbnail, location.imageUrl)}" 
-            class="marker-image" 
-            style="width: 40px; 
-                    height: 40px; 
-                    border-radius: 50%; 
-                    object-fit: cover; 
-                    border: 2px solid #fff; 
-                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
-                    position: absolute; 
-                    top: -12px;" 
-            onmouseover="this.style.border='2px solid green';" 
-            onmouseout="this.style.border='2px solid #fff';" />
+        <img src="${checkThumbnail(location.thumbnail, location.imageUrl)}"
+             class="marker-image"
+             style="width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #fff;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                    position: absolute;
+                    top: -12px;"
+             onmouseover="this.style.border='2px solid green';"
+             onmouseout="this.style.border='2px solid #fff';" />
         <span class="marker-pin">📍</span>
-    </div>
+      </div>
     `,
     iconSize: [40, 40],
     iconAnchor: [20, 40],
@@ -293,8 +322,6 @@ const addMarker = (location) => {
   });
   const marker = L.marker(location.coords, { icon: customIcon }).addTo(map.value);
   marker.bindPopup(`<b>${location.name}</b><br>📍${location.coords.join(', ')}`);
-  // marker.bindPopup(`<br><b>${location.coords.join(', ')}</b>`);
-  // marker.bindPopup(`<b>${location.name}</b><br>${location.description || 'Không có mô tả'}`);
   marker.on('mouseover', () => marker.openPopup());
   marker.on('mouseout', () => marker.closePopup());
   marker.on('click', () => {
@@ -304,24 +331,23 @@ const addMarker = (location) => {
   markers.value[location.id] = marker;
 };
 
-// Mở chế độ click để chọn điểm
 const openMapClick = () => {
   if (!map.value) return;
   map.value.on('click', (e) => {
     tempLatLng.value = e.latlng;
-    if (thaiNguyenBounds.value && thaiNguyenBounds.value.contains(tempLatLng.value)) {
+    if (provinceBounds.value && provinceBounds.value.contains(tempLatLng.value)) {
       newLocation.value.latitude = tempLatLng.value.lat;
       newLocation.value.longitude = tempLatLng.value.lng;
       newLocation.value.coords = [tempLatLng.value.lat, tempLatLng.value.lng];
+      newLocation.value.province = selectedProvince.value;
       showForm.value = true;
     } else {
-      alert('Vui lòng chọn điểm trong phạm vi tỉnh Thái Nguyên!');
+      alert(`Vui lòng chọn điểm trong phạm vi tỉnh ${provinceConfig.value[selectedProvince.value].displayName}!`);
     }
     map.value.off('click');
   });
 };
 
-// Dán tọa độ từ clipboard
 const pasteCoords = async (field) => {
   try {
     const text = await navigator.clipboard.readText();
@@ -336,9 +362,7 @@ const pasteCoords = async (field) => {
   }
 };
 
-// Lưu địa điểm
 const saveLocation = async () => {
-  // if (!newLocation.value.name || !newLocation.value.url || !newLocation.value.latitude || !newLocation.value.longitude) {
   if (!newLocation.value.name || !newLocation.value.latitude || !newLocation.value.longitude) {
     alert('Vui lòng nhập đầy đủ tên và tọa độ.');
     return;
@@ -350,6 +374,7 @@ const saveLocation = async () => {
       url: newLocation.value.url,
       latitude: newLocation.value.latitude,
       longitude: newLocation.value.longitude,
+      province: provinceConfig.value[selectedProvince.value].displayName,
     };
     const response = await createPlaceApi(payload);
     const newPlace = {
@@ -359,26 +384,26 @@ const saveLocation = async () => {
       coords: [payload.latitude, payload.longitude],
       url: payload.url,
       thumbnail: payload.url || 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg',
+      province: selectedProvince.value,
     };
     locations.value.push(newPlace);
     addMarker(newPlace);
     showForm.value = false;
-    newLocation.value = { name: '', description: '', url: '', latitude: null, longitude: null, coords: null };
+    newLocation.value = { name: '', description: '', url: '', latitude: null, longitude: null, coords: null, province: selectedProvince.value };
   } catch (error) {
     console.error('Lỗi khi tạo địa điểm:', error);
     alert('Không thể tạo địa điểm. Vui lòng thử lại.');
   }
 };
 
-// Lưu địa điểm bằng tọa độ
 const saveLocationByCoords = async () => {
   if (!newLocation.value.name || !newLocation.value.url || !newLocation.value.latitude || !newLocation.value.longitude) {
     alert('Vui lòng nhập đầy đủ tên, đường dẫn và tọa độ.');
     return;
   }
   const latLng = L.latLng(newLocation.value.latitude, newLocation.value.longitude);
-  if (!thaiNguyenBounds.value.contains(latLng)) {
-    alert('Tọa độ không nằm trong phạm vi tỉnh Thái Nguyên!');
+  if (!provinceBounds.value.contains(latLng)) {
+    alert(`Tọa độ không nằm trong phạm vi tỉnh ${provinceConfig.value[selectedProvince.value].displayName}!`);
     return;
   }
   try {
@@ -388,6 +413,7 @@ const saveLocationByCoords = async () => {
       url: newLocation.value.url,
       latitude: newLocation.value.latitude,
       longitude: newLocation.value.longitude,
+      province: provinceConfig.value[selectedProvince.value].displayName,
     };
     const response = await createPlaceApi(payload);
     const newPlace = {
@@ -397,31 +423,29 @@ const saveLocationByCoords = async () => {
       coords: [payload.latitude, payload.longitude],
       url: payload.url,
       thumbnail: payload.url || 'https://i.pinimg.com/736x/98/2e/5a/982e5a064861811e22abcf0e76373efd.jpg',
+      province: selectedProvince.value,
     };
     locations.value.push(newPlace);
     addMarker(newPlace);
     showCoordsForm.value = false;
-    newLocation.value = { name: '', description: '', url: '', latitude: null, longitude: null, coords: null };
+    newLocation.value = { name: '', description: '', url: '', latitude: null, longitude: null, coords: null, province: selectedProvince.value };
   } catch (error) {
     console.error('Lỗi khi tạo địa điểm:', error);
     alert('Không thể tạo địa điểm. Vui lòng thử lại.');
   }
 };
 
-// Hủy form
 const cancelForm = () => {
   showForm.value = false;
-  newLocation.value = { name: '', description: '', url: '', latitude: null, longitude: null, coords: null };
+  newLocation.value = { name: '', description: '', url: '', latitude: null, longitude: null, coords: null, province: selectedProvince.value };
 };
 
-// Mở URL
 const openUrl = () => {
   if (selectedLocation.value.url) {
     window.open(selectedLocation.value.url, '_blank');
   }
 };
 
-// Highlight địa điểm
 const highlightLocation = (location) => {
   if (!map.value) return;
   selectedLocation.value = location;
@@ -432,7 +456,6 @@ const highlightLocation = (location) => {
   }
 };
 
-// Cleanup khi component bị hủy
 onBeforeUnmount(() => {
   if (map.value) {
     map.value.off();
@@ -441,7 +464,6 @@ onBeforeUnmount(() => {
   }
 });
 
-// Khởi tạo
 onMounted(() => {
   initializeMap();
   loadLocations();
@@ -449,6 +471,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.province-selector {
+  margin-top: 10px;
+}
+.province-selector label {
+  margin-right: 10px;
+}
+.province-selector select {
+  padding: 5px;
+  border-radius: 4px;
+}
+
 .card {
   border: none;
   border-radius: 12px;

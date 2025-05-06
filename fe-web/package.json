@@ -10,13 +10,16 @@
   "dependencies": {
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@vueform/multiselect": "^2.6.10",
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.7.7",
     "core-js": "^3.8.3",
     "firebase": "^11.6.0",
     "pannellum": "^2.5.6",
+    "quill": "^2.0.3",
     "vue": "^3.2.13",
     "vue-good-table": "^2.21.11",
     "vue-pannellum": "^0.5.3",
+    "vue-quill": "^1.5.1",
     "vue-router": "^4.4.5",
     "vue-select2-component": "^1.0.1",
     "vue3-select2-component": "^0.1.7"

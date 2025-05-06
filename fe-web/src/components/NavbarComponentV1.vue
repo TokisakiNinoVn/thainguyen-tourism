@@ -22,6 +22,9 @@
       <router-link to="/places" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Blogs</router-link>
     </nav>
     <nav class="flex items-center gap-6">
+      <router-link to="/create-blog" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Create Blogs</router-link>
+    </nav>
+    <nav class="flex items-center gap-6">
       <router-link to="/chat" class="text-gray-700 font-medium text-[13.6px] hover:text-green-600">Chatbot</router-link>
     </nav>
     <nav class="flex items-center gap-6">

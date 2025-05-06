@@ -29,6 +29,7 @@ public class PlaceController : ControllerBase
         _env = env;
     }
 
+    // Lấy danh sách địa điểm
     [HttpGet("list")]
     public IActionResult GetAllPlaces()
     {
@@ -42,7 +43,7 @@ public class PlaceController : ControllerBase
             {
                 var media = _context.PlaceMedia
                     .FirstOrDefault(pm => pm.Id == place.Thumbnail.Value);
-                
+
                 if (media != null)
                 {
                     imageUrl = media.MediaUrl;
@@ -58,6 +59,7 @@ public class PlaceController : ControllerBase
                 place.Longitude,
                 place.Thumbnail,
                 place.CreatedAt,
+                place.Province,
                 ImageUrl = imageUrl
             };
         }).ToList();
@@ -90,6 +92,7 @@ public class PlaceController : ControllerBase
                     p.Description,
                     p.Latitude,
                     p.Longitude,
+                    p.Province,
                     p.Thumbnail
                 }).ToList()
             }
@@ -136,6 +139,7 @@ public class PlaceController : ControllerBase
                 place.Latitude,
                 place.Longitude,
                 place.Thumbnail,
+                place.Province,
                 ImageUrl = imageUrl // Trả về URL ảnh trong đối tượng ẩn danh
             }
         });
@@ -370,7 +374,84 @@ public class PlaceController : ControllerBase
         });
     }
 
+    // lấy danh danh sách địa trường Belong
+    // [HttpGet("province")]
+    // public IActionResult GetPlacesByBelong([FromQuery] string province)
+    // {
+    //     var places = _context.Places.Where(p => p.Province == province).ToList();
+    //     if (places == null || places.Count == 0)
+    //     {
+    //         return NotFound(new
+    //         {
+    //             code = 200,
+    //             status = "success",
+    //             message = "Không tìm thấy địa điểm nào",
+    //             data = new object[0]
+    //         });
+    //     }
 
+    //     return Ok(new
+    //     {
+    //         code = 200,
+    //         status = "success",
+    //         message = "Lấy danh sách địa điểm thành công",
+    //         data = places
+    //     });
+    // }
+    // Lấy danh sách địa điểm theo tỉnh
+    [HttpGet("province")]
+    public IActionResult GetPlacesByProvince([FromQuery] string province)
+    {
+        var places = _context.Places.Where(p => p.Province == province).ToList();
+
+        if (places == null || places.Count == 0)
+        {
+            return NotFound(new
+            {
+                code = 404, // Changed to 404 for NotFound
+                status = "error", // Changed to "error" for better semantics
+                message = "Không tìm thấy địa điểm nào cho tỉnh này.",
+                data = new List<object>() // Use List<object> for consistency
+            });
+        }
+
+        var placeDtos = places.Select(place =>
+        {
+            string? imageUrl = null;
+
+            if (place.Thumbnail.HasValue)
+            {
+                var media = _context.PlaceMedia
+                    .FirstOrDefault(pm => pm.Id == place.Thumbnail.Value);
+
+                if (media != null)
+                {
+                    imageUrl = media.MediaUrl;
+                }
+            }
+
+            return new
+            {
+                place.Id,
+                place.Name,
+                place.Description,
+                place.Latitude,
+                place.Longitude,
+                place.Thumbnail,
+                place.CreatedAt,
+                place.Province,
+                ImageUrl = imageUrl
+            };
+        }).ToList();
+
+        return Ok(new
+        {
+            code = 200,
+            status = "success",
+            message = "Lấy danh sách địa điểm thành công",
+            data = placeDtos
+        });
+    }
 
     // [HttpGet("search")]
     // public IActionResult SearchPlaces([FromQuery] string query)

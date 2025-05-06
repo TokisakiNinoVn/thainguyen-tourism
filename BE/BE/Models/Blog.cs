@@ -18,6 +18,7 @@ public class Blog
     
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string Place { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public string Status { get; set; } = "draft";
     public int AuthorId { get; set; }

@@ -43,7 +43,9 @@ public class BlogController : ControllerBase
         blog.AuthorId = int.Parse(userId ?? "0");
         blog.CreatedAt = DateTime.UtcNow;
         blog.UpdatedAt = DateTime.UtcNow;
-        blog.Status = "draft";
+        blog.Thumbnail = 0;
+        blog.Place = string.Empty;
+        blog.Status = "0";
         _context.Blogs.Add(blog);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetBlog), new { id = blog.Id }, blog);
@@ -82,4 +84,14 @@ public class BlogController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+}
+
+public class BlogMedia
+{
+    public int Id { get; set; }
+    public int BlogId { get; set; }
+    public string MediaUrl { get; set; } = string.Empty;
+    public int MediaType { get; set; } // 1: image, 2: video,
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

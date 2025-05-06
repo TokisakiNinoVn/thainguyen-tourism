@@ -1,6 +1,7 @@
 import instance from '@/apis/axiosConfig';
 
 const getListPlaceApi = async () => instance.get('/api/admin/place/list');
+const getListPlaceProvinApi = async (province) => instance.get('/api/admin/place/province', { params: { province: province } });
 // create place
 const createPlaceApi = async (data) => instance.post('/api/admin/place/create', data);
 // update place
@@ -18,5 +19,6 @@ export {
     updatePlaceApi,
     deletePlaceApi,
     getPlaceByIdApi,
-    updateThumbnailApi
+    updateThumbnailApi,
+    getListPlaceProvinApi
 };

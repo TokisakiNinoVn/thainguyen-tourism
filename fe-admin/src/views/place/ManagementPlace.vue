@@ -17,7 +17,7 @@
                 <tr>
                   <th scope="col">Thumbnail</th>
                   <th scope="col">Tên</th>
-                  <!-- <th scope="col">Mô tả</th> -->
+                  <th scope="col">Tỉnh</th>
                   <th scope="col">Kinh độ</th>
                   <th scope="col">Vĩ độ</th>
                   <th scope="col">Ngày tạo</th>
@@ -65,7 +65,7 @@
                     <!-- </img> -->
                   </td>
                   <td>{{ place.name }}</td>
-                  <!-- <td>{{ place.description }}</td> -->
+                  <td>{{ place.province }}</td>
                   <td>{{ place.longitude }}</td>
                   <td>{{ place.latitude }}</td>
                   <td>{{ formatDate(place.createdAt) }}</td>

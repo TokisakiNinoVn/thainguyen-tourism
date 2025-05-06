@@ -20,6 +20,7 @@ public class Place
     public double? Latitude { get; set; } // demo: 21.814645988656277
     public double? Longitude { get; set; } // demo: 105.99999999999999
     public int? Thumbnail { get; set; } // demo: 1 (id of the image in the database)
+    public string? Province { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     
