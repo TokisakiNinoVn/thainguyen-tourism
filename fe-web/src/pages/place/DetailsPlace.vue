@@ -31,7 +31,7 @@
       <button
         class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
       >
-        <router-link to="/mediaplace" class="text-white font-semibold">
+        <router-link :to='`/places/media/${placeId}`' class="text-white font-semibold">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-5 w-5 inline-block ml-2"

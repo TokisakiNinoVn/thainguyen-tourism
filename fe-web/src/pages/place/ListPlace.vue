@@ -32,7 +32,7 @@
         </button> -->
         <router-link 
             class="mt-auto bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-            :to="`/places/media/${place.id}`"
+            :to="`/places/${place.id}`"
         >
             <i class="fas fa-plus"></i>
             Xem chi tiết

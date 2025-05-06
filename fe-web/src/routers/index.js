@@ -15,6 +15,7 @@ import BlankPage from '@/pages/BlankPage.vue';
 
 import ListPlace from '@/pages/place/ListPlace.vue';
 import DetailsPlace from '@/pages/place/DetailsPlace.vue';
+import DetailsPlaceMedia from '@/pages/place/DetailsPlaceMedia.vue';
 import ChatPage from '@/pages/chat/ChatPage.vue';
 
 
@@ -23,7 +24,8 @@ const routes = [
   { path: '/blank', component: BlankPage },
   { path: '/login', component: Login },
   { path: '/places', component: ListPlace },
-  { path: '/places/media/:id', component: DetailsPlace },
+  { path: '/places/:id', component: DetailsPlace },
+  { path: '/places/media/:id', component: DetailsPlaceMedia },
   // { path: '/complaints-management', component: ComplaintsManagementPage },
   // { path: '/customer-list', component: CustomerManagerment },
   // { path: '/user', component: InforPage },

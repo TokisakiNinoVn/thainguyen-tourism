@@ -1,285 +1,361 @@
 <template>
-  <NavbarComponentV1 />
-
-  <!-- Main Container -->
-  <div class="container mx-auto px-4 py-8">
-
-    <!-- Place Info Card -->
-    <div class="card bg-white shadow-xl rounded-lg overflow-hidden">
-      <div class="card-header bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
-        <h5 class="text-xl font-semibold">Thông tin địa điểm</h5>
-      </div>
-      <div class="card-body p-6">
-        <h6 class="text-2xl font-bold mb-4">{{ place.name || 'Đang tải...' }}</h6>
-        <img
-          v-if="place.imageUrl"
-          :src="instance.defaults.baseURL + place.imageUrl"
-          alt="Ảnh đại diện"
-          class="w-full max-w-md rounded-lg shadow-md mb-4 cursor-pointer"
-          @click="openFullScreen(instance.defaults.baseURL + place.imageUrl, 'image')"
-        />
-        <div v-html="place.description || ''" class="prose max-w-none mb-4"></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <p><strong>Vĩ độ:</strong> {{ place.latitude ?? 'N/A' }}</p>
-          <p><strong>Kinh độ:</strong> {{ place.longitude ?? 'N/A' }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Media Button -->
-    <div class="mt-8">
-      <button
-        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
-        @click="openMediaPopup"
+  <div class="relative min-h-screen">
+    <!-- Main Content -->
+    <div class="relative">
+      <!-- Left Sidebar (Place Info) -->
+      <div 
+        :class="{
+          'translate-x-0': showLeftMenu,
+          '-translate-x-full': !showLeftMenu
+        }" 
+        class="fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-40 transition-transform duration-300 overflow-y-auto"
       >
-        Xem media của địa điểm
-      </button>
-    </div>
-
-    <!-- Reviews Section -->
-    <div class="card bg-white shadow-xl rounded-lg overflow-hidden mt-8">
-      <div class="card-header bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
-        <h5 class="text-xl font-semibold">Đánh giá</h5>
-      </div>
-
-      <div class="card-body p-6">
-        <div class="flex items-center mb-4">
-          <h6 class="text-lg font-semibold">Đánh giá của bạn:</h6>
-          <button
-            class="ml-auto bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-            @click="$emit('add-review')"
+        <div class="p-4">
+          <!-- Close/Open Button -->
+          <button 
+            @click="showLeftMenu = !showLeftMenu"
+            class="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
           >
-            Thêm đánh giá
+            <svg v-if="showLeftMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div v-for="star in 5" :key="star" class="flex items-center">
-            <span class="text-yellow-400">★</span>
-            <span class="ml-2">{{ star }}</span>
-          </div>
-        </div>
-        <div class="mt-4">
-          <textarea
-            class="w-full p-2 border rounded-lg"
-            rows="3"
-            placeholder="Viết đánh giá của bạn..."
-          ></textarea>
-        </div>
-        <button
-          class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          @click="$emit('submit-review')"
-        >
-          Gửi đánh giá
-        </button>
-      </div>
 
-      <div class="card-body p-6">
-        <div
-          v-for="review in reviews"
-          :key="review.id"
-          class="border-b border-gray-200 py-4 last:border-b-0"
-        >
-          <div class="flex items-center mb-2">
-            <span class="font-semibold text-lg">{{ review.userName }}</span>
-            <div class="ml-3 flex">
-              <span
-                v-for="star in 5"
-                :key="star"
-                class="text-yellow-400"
-                :class="{ 'opacity-30': star > review.rating }"
-              >★</span>
+          <!-- Place Info -->
+          <div class="mt-8">
+            <h5 class="text-xl font-semibold text-blue-600">Thông tin địa điểm</h5>
+            <h6 class="text-2xl font-bold mt-4 mb-4">{{ place.name || 'Đang tải...' }}</h6>
+            <img
+              v-if="place.imageUrl"
+              :src="instance.defaults.baseURL + place.imageUrl"
+              alt="Ảnh đại diện"
+              class="w-full max-w-md rounded-lg shadow-md mb-4 cursor-pointer"
+            />
+            <div v-html="place.description || ''" class="prose max-w-none mb-4"></div>
+            <div class="grid grid-cols-1 gap-4">
+              <p><strong>Vĩ độ:</strong> {{ place.latitude ?? 'N/A' }}</p>
+              <p><strong>Kinh độ:</strong> {{ place.longitude ?? 'N/A' }}</p>
             </div>
           </div>
-          <p class="text-gray-600">{{ review.comment }}</p>
-          <p class="text-sm text-gray-500 mt-1">{{ review.date }}</p>
         </div>
-        <p v-if="!reviews.length" class="text-gray-500">Chưa có đánh giá nào.</p>
       </div>
-    </div>
 
-    <!-- Full Screen Modal -->
-    <div
-      v-if="showFullScreen"
-      class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-    >
-      <button
-        class="absolute top-4 right-4 text-white text-2xl"
-        @click="closeFullScreen"
+      <!-- Right Sidebar (Reviews) -->
+      <div 
+        :class="{
+          'translate-x-0': showRightMenu,
+          'translate-x-full': !showRightMenu
+        }" 
+        class="fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-40 transition-transform duration-300 overflow-y-auto"
       >
-        ×
-      </button>
-      <img
-        v-if="fullScreenType === 'image'"
-        :src="fullScreenUrl"
-        class="max-w-full max-h-full object-contain"
-      />
-      <video
-        v-if="fullScreenType === 'video'"
-        :src="fullScreenUrl"
-        controls
-        autoplay
-        class="max-w-full max-h-full"
-      ></video>
-    </div>
+        <div class="p-4">
+          <!-- Close/Open Button -->
+          <button 
+            @click="showRightMenu = !showRightMenu"
+            class="absolute top-4 left-4 text-gray-600 hover:text-gray-800"
+          >
+            <svg v-if="showRightMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
 
-    <!-- Media Popup Modal -->
-    <div
-      v-if="showMediaPopup"
-      class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-    >
+          <!-- Reviews -->
+          <div class="mt-8">
+            <h5 class="text-xl font-semibold text-blue-600">Đánh giá</h5>
+            <button
+              v-if="!showReviewForm"
+              class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors mt-4"
+              @click="showReviewForm = true"
+            >
+              Thêm đánh giá
+            </button>
+            <div v-if="showReviewForm" class="mb-4 mt-4">
+              <div class="flex items-center mb-4">
+                <span class="mr-2">Điểm đánh giá:</span>
+                <div class="flex">
+                  <button
+                    v-for="star in 5"
+                    :key="star"
+                    @click="newReview.rating = star"
+                    class="text-2xl"
+                    :class="star <= newReview.rating ? 'text-yellow-400' : 'text-gray-300'"
+                  >
+                    ★
+                  </button>
+                </div>
+              </div>
+              <textarea
+                v-model="newReview.comment"
+                class="w-full p-2 border rounded-lg"
+                rows="3"
+                placeholder="Viết đánh giá của bạn..."
+              ></textarea>
+              <div class="mt-2 flex gap-2">
+                <button
+                  class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  @click="submitReview"
+                >
+                  Gửi đánh giá
+                </button>
+                <button
+                  class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                  @click="cancelReview"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+            <div class="mt-6">
+              <div
+                v-for="review in reviews"
+                :key="review.id"
+                class="border-b border-gray-200 py-4 last:border-b-0"
+              >
+                <div class="flex items-center mb-2">
+                  <img
+                    alt="Avatar"
+                    class="w-10 h-10 rounded-full mr-3"
+                    src="https://i.pinimg.com/736x/48/e1/02/48e102b6e1dcf19306de4cc1504b2205.jpg"
+                  />
+                  <span class="font-semibold text-lg">{{ review.displayName }}</span>
+                  <div class="ml-3 flex">
+                    <span
+                      v-for="star in 5"
+                      :key="star"
+                      class="text-yellow-400"
+                      :class="{ 'opacity-30': star > review.rating }"
+                    >★</span>
+                  </div>
+                </div>
+                <p class="text-gray-600">{{ review.content }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ formatDate(review.createdAt) }}</p>
+              </div>
+              <p v-if="!reviews.length" class="text-gray-500">Chưa có đánh giá nào.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toggle Buttons for Sidebars -->
       <button
-        class="absolute top-4 right-4 text-white text-2xl"
-        @click="closeMediaPopup"
+        @click="showLeftMenu = !showLeftMenu"
+        class="fixed top-1/2 left-0 z-50 bg-blue-500 text-white p-2 rounded-r-lg transform -translate-y-1/2"
       >
-        ×
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <button
+        @click="showRightMenu = !showRightMenu"
+        class="fixed top-1/2 right-0 z-50 bg-blue-500 text-white p-2 rounded-l-lg transform -translate-y-1/2"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
       </button>
 
-      <!-- Media Display -->
-      <div class="relative w-full h-full flex items-center justify-center">
-        <!-- Previous Button -->
-        <button
-          class="absolute left-4 text-white text-3xl bg-gray-800 bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-opacity-75"
-          @click="prevMedia"
-        >
-          ←
-        </button>
-
+      <!-- Main Media Display -->
+      <div class="relative w-full h-screen bg-black flex items-center justify-center">
         <!-- Media Content -->
-        <div class="max-w-5xl max-h-[80vh] flex items-center justify-center">
+        <div class="w-full h-full flex items-center justify-center">
           <img
             v-if="currentMedia && currentMedia.mediaType === 1"
             :src="instance.defaults.baseURL + currentMedia.mediaUrl"
-            class="max-w-full max-h-full object-contain"
+            class="w-full h-full object-contain"
           />
           <div
             v-if="currentMedia && currentMedia.mediaType === 2"
             :id="'pannellum-viewer-' + currentMedia.id"
-            class="w-full h-[80vh]"
+            class="w-full h-full"
           ></div>
           <video
             v-if="currentMedia && currentMedia.mediaType === 3"
             :src="instance.defaults.baseURL + currentMedia.mediaUrl"
             controls
             autoplay
-            class="max-w-full max-h-full"
+            class="w-full h-full object-contain"
           ></video>
         </div>
 
-        <!-- Next Button -->
-        <button
-          class="absolute right-4 text-white text-3xl bg-gray-800 bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-opacity-75"
-          @click="nextMedia"
-        >
-          →
-        </button>
-      </div>
-
-      <!-- Control Bar -->
-      <div class="absolute bottom-4 left-0 right-0 flex justify-center">
-        <div class="bg-gray-800 bg-opacity-75 rounded-lg p-4 flex items-center gap-4">
-          <button
-            class="text-white hover:text-gray-300"
-            @click="toggleAudioMute"
-            :title="isMuted ? 'Bật âm thanh' : 'Tắt âm thanh'"
-          >
-            <svg
-              v-if="isMuted"
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        <!-- Control Bar -->
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center z-30">
+          <div class="bg-gray-800 bg-opacity-75 rounded-lg p-4 flex items-center gap-4">
+            <!-- Previous Button -->
+            <button
+              class="text-white hover:text-gray-300"
+              @click="prevMedia"
+              title="Media trước"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15zM17 9l4 4m0-4l-4 4"
-              />
-            </svg>
-            <svg
-              v-else
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <!-- Zoom In (360 only) -->
+            <button
+              class="text-white hover:text-gray-300"
+              :disabled="currentMedia?.mediaType !== 2"
+              @click="zoomIn"
+              :title="currentMedia?.mediaType === 2 ? 'Phóng to' : 'Không khả dụng'"
+              :class="{ 'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2 }"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z"
-              />
-            </svg>
-          </button>
-          <button
-            class="text-white hover:text-gray-300"
-            @click="toggleAudioPlay"
-            :title="isAudioPlaying ? 'Tạm dừng' : 'Phát'"
-          >
-            <svg
-              v-if="isAudioPlaying"
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+            <!-- Zoom Out (360 only) -->
+            <button
+              class="text-white hover:text-gray-300"
+              :disabled="currentMedia?.mediaType !== 2"
+              @click="zoomOut"
+              :title="currentMedia?.mediaType === 2 ? 'Thu nhỏ' : 'Không khả dụng'"
+              :class="{ 'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2 }"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <svg
-              v-else
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+              </svg>
+            </button>
+            <!-- Auto Rotate (360 only) -->
+            <button
+              class="text-white hover:text-gray-300"
+              :disabled="currentMedia?.mediaType !== 2"
+              @click="toggleAutoRotate"
+              :title="currentMedia?.mediaType === 2 ? (isAutoRotating ? 'Tắt tự động xoay' : 'Bật tự động xoay') : 'Không khả dụng'"
+              :class="{ 'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2 }"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            v-model="audioVolume"
-            class="w-24"
-            @input="adjustVolume"
-            title="Điều chỉnh âm lượng"
-          />
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                :class="{ 'text-yellow-400': isAutoRotating && currentMedia?.mediaType === 2 }"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h5m0 0l-3-3m3 3l3-3m6 6v5h-5m0 0l3 3m-3-3l-3 3"
+                />
+              </svg>
+            </button>
+            <!-- Audio Controls -->
+            <button
+              class="text-white hover:text-gray-300"
+              @click="toggleAudioMute"
+              :title="isMuted ? 'Bật âm thanh' : 'Tắt âm thanh'"
+            >
+              <svg
+                v-if="isMuted"
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15zM17 9l4 4m0-4l-4 4"
+                />
+              </svg>
+              <svg
+                v-else
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z"
+                />
+              </svg>
+            </button>
+            <button
+              class="text-white hover:text-gray-300"
+              @click="toggleAudioPlay"
+              :title="isAudioPlaying ? 'Tạm dừng' : 'Phát'"
+            >
+              <svg
+                v-if="isAudioPlaying"
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <svg
+                v-else
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              v-model="audioVolume"
+              class="w-24"
+              @input="adjustVolume"
+              title="Điều chỉnh âm lượng"
+            />
+            <!-- Next Button -->
+            <button
+              class="text-white hover:text-gray-300"
+              @click="nextMedia"
+              title="Media tiếp theo"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-    </div>
-
-    <FooterComponent />
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getPlaceByIdApi, getReviewPlaceByIdApi } from '@/services/modules/place.api';
+import { createReviewApi } from '@/services/modules/review.api';
 import { getListMediaPlaceApi } from '@/services/modules/mediaplace.api';
-import NavbarComponentV1 from '@/components/NavbarComponentV1.vue';
-import FooterComponent from '@/components/FooterComponent.vue';
 import instance from '@/services/axiosConfig';
 
 // Get place ID from route
 const route = useRoute();
+const router = useRouter();
 const placeId = route.params.id;
 
 // Reactive state for place and media
@@ -290,23 +366,40 @@ const images360 = ref([]);
 const videos = ref([]);
 const audios = ref([]);
 
-// Reviews (static for now, could be fetched from an API)
+// Reviews
 const reviews = ref([]);
+const showReviewForm = ref(false);
+const newReview = ref({
+  rating: 0,
+  comment: ''
+});
 
-// Full Screen Modal State
-const showFullScreen = ref(false);
-const fullScreenUrl = ref('');
-const fullScreenType = ref('');
+// Sidebar states
+const showLeftMenu = ref(true);
+const showRightMenu = ref(true);
 
-// Media Popup State
-const showMediaPopup = ref(false);
+// Media state
 const currentMediaIndex = ref(0);
 const currentMedia = ref(null);
 const audioElement = ref(null);
 const isAudioPlaying = ref(false);
 const isMuted = ref(false);
 const audioVolume = ref(0.5);
+const isAutoRotating = ref(true);
+const pannellumViewer = ref(null);
 
+// format date function
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('vi-VN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+  
 // Fetch place details
 const fetchPlaceDetails = async () => {
   try {
@@ -317,14 +410,52 @@ const fetchPlaceDetails = async () => {
   }
 };
 
-// Fetch reviews (static for now, could be fetched from an API)
+// Fetch reviews
 const fetchReviews = async () => {
   try {
     const response = await getReviewPlaceByIdApi(placeId);
-    reviews.value = response.data.data || [];
+    reviews.value = JSON.parse(response.data.data) || [];
   } catch (error) {
     console.error('Lỗi khi tải đánh giá:', error);
   }
+};
+
+// Submit review
+const submitReview = async () => {
+  if (!newReview.value.rating || !newReview.value.comment.trim()) {
+    alert('Vui lòng chọn số sao và viết nhận xét!');
+    return;
+  }
+  const isLogin = localStorage.getItem('isLoggedIn');
+  if (isLogin === 'false') {
+    alert('Vui lòng đăng nhập để gửi đánh giá!');
+    router.push('/login');
+    return;
+  }
+
+  try {
+    const payload = {
+      placeId: parseInt(placeId),
+      rating: newReview.value.rating,
+      reviewDescription: newReview.value.comment
+    };
+    
+    const response = await createReviewApi(payload);
+    if (response.status === 200) { 
+      newReview.value = { rating: 0, comment: '' };
+      showReviewForm.value = false;
+      await fetchReviews();
+      alert('Đánh giá của bạn đã được gửi thành công! Chúng tôi sẽ sớm duyệt nó.');
+    }
+  } catch (error) {
+    console.error('Lỗi khi gửi đánh giá:', error);
+    alert('Đã có lỗi xảy ra khi gửi đánh giá!');
+  }
+};
+
+const cancelReview = () => {
+  newReview.value = { rating: 0, comment: '' };
+  showReviewForm.value = false;
 };
 
 // Fetch and categorize media
@@ -337,42 +468,18 @@ const fetchMediaList = async () => {
     images360.value = mediaData.filter((item) => item.mediaType === 2);
     videos.value = mediaData.filter((item) => item.mediaType === 3);
     audios.value = mediaData.filter((item) => item.mediaType === 4);
+    if (mediaData.length > 0) {
+      currentMediaIndex.value = 0;
+      currentMedia.value = mediaData[0];
+      initializeAudio();
+      initialize360Viewer();
+    }
   } catch (error) {
     console.error('Lỗi khi tải danh sách media:', error);
   }
 };
 
-// Full Screen Modal Functions
-const openFullScreen = (url, type) => {
-  fullScreenUrl.value = url;
-  fullScreenType.value = type;
-  showFullScreen.value = true;
-};
-
-const closeFullScreen = () => {
-  showFullScreen.value = false;
-  fullScreenUrl.value = '';
-  fullScreenType.value = '';
-};
-
-// Media Popup Functions
-const openMediaPopup = () => {
-  if (allMedia.value.length > 0) {
-    showMediaPopup.value = true;
-    currentMediaIndex.value = 0;
-    currentMedia.value = allMedia.value[0];
-    initializeAudio();
-    initialize360Viewer();
-  }
-};
-
-const closeMediaPopup = () => {
-  showMediaPopup.value = false;
-  currentMedia.value = null;
-  currentMediaIndex.value = 0;
-  stopAudio();
-};
-
+// Media Navigation Functions
 const prevMedia = () => {
   if (allMedia.value.length > 0) {
     currentMediaIndex.value =
@@ -391,6 +498,32 @@ const nextMedia = () => {
   }
 };
 
+// 360 Image Controls
+const zoomIn = () => {
+  if (pannellumViewer.value && currentMedia.value?.mediaType === 2) {
+    const currentHfov = pannellumViewer.value.getHfov();
+    pannellumViewer.value.setHfov(currentHfov - 10, 200); // Zoom in by reducing HFOV
+  }
+};
+
+const zoomOut = () => {
+  if (pannellumViewer.value && currentMedia.value?.mediaType === 2) {
+    const currentHfov = pannellumViewer.value.getHfov();
+    pannellumViewer.value.setHfov(currentHfov + 10, 200); // Zoom out by increasing HFOV
+  }
+};
+const toggleAutoRotate = () => {
+  if (pannellumViewer.value && currentMedia.value?.mediaType === 2) {
+    isAutoRotating.value = !isAutoRotating.value;
+
+    if (isAutoRotating.value) {
+      pannellumViewer.value.startAutoRotate(-2);
+    } else {
+      pannellumViewer.value.stopAutoRotate();
+    }
+  }
+};
+
 const initializeAudio = () => {
   const audioMedia = audios.value[0];
   if (audioMedia) {
@@ -402,14 +535,6 @@ const initializeAudio = () => {
     }).catch((error) => {
       console.error('Lỗi khi phát audio:', error);
     });
-  }
-};
-
-const stopAudio = () => {
-  if (audioElement.value) {
-    audioElement.value.pause();
-    audioElement.value.currentTime = 0;
-    isAudioPlaying.value = false;
   }
 };
 
@@ -473,31 +598,33 @@ const initialize360Viewer = async () => {
 
       setTimeout(() => {
         try {
-          window.pannellum.viewer(viewerId, {
+          pannellumViewer.value = window.pannellum.viewer(viewerId, {
             type: 'equirectangular',
             panorama: panoramaUrl,
             autoLoad: true,
-            showZoomCtrl: true,
+            showZoomCtrl: false, // Hide default zoom controls
             showFullscreenCtrl: true,
-            autoRotate: -2,
+            autoRotate: isAutoRotating.value ? -2 : false,
           });
         } catch (error) {
           console.error('Error initializing Pannellum viewer:', error);
         }
       }, 100);
     } catch (error) {
-      // console.error(`Failed to fetch image at ${panoramaUrl}:`, error);
       console.error(`Failed to fetch image at:`, error);
     }
+  } else {
+    pannellumViewer.value = null;
   }
 };
 
 // Watch for changes in currentMedia to handle 360 viewer initialization
 watch(currentMedia, () => {
+  isAutoRotating.value = true; // Reset to auto-rotate for new 360 images
   initialize360Viewer();
 });
 
-// Load Pannellum assets
+// Load Pannellum assets and data
 onMounted(() => {
   const existingLink = document.querySelector('link[href="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css"]');
   if (!existingLink) {
@@ -523,42 +650,3 @@ onMounted(() => {
   fetchMediaList();
 });
 </script>
-
-<style scoped>
-.card {
-  transition: transform 0.2s;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-}
-
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  background: #d3d3d3;
-  border-radius: 3px;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #ffffff;
-  border: 2px solid #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #ffffff;
-  border: 2px solid #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-}
-</style>
