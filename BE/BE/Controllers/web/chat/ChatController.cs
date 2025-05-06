@@ -213,6 +213,98 @@ namespace Controllers.web.chat
             }
         }
 
+        // Lấy các câu hỏi chatbot mặc định
+        [HttpGet("default-questions")]
+        public IActionResult GetDefaultQuestions()
+        {
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("SELECT id, question FROM chatdefault", conn);
+                var defaultQuestions = new List<object>();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        defaultQuestions.Add(new
+                        {
+                            Id = reader["id"],
+                            Question = reader["question"],
+                        });
+                    }
+
+                    return Ok(new
+                    {
+                        code = 200,
+                        status = "success",
+                        message = "Lấy câu hỏi mặc định thành công",
+                        data = defaultQuestions
+                    });
+                }
+            }
+        }
+
+        // trả lời các câu hỏi mặc định
+        [HttpPost("default-questions/answer")]
+
+        public IActionResult AnswerDefaultQuestion([FromBody] ChatMessage message)
+        {
+            if (message == null || string.IsNullOrEmpty(message.Content))
+                return BadRequest("Invalid message data.");
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized("User not authenticated.");
+
+            // Lưu tin nhắn request vào bảng chatdata với type = "request"
+            int requestId;
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand(
+                    "INSERT INTO chatdata (userId, content, type, createdAt) VALUES (@userId, @content, 'request', @createdAt); SELECT LAST_INSERT_ID();",
+                    conn
+                );
+                cmd.Parameters.AddWithValue("@userId", int.Parse(userId));
+                cmd.Parameters.AddWithValue("@content", message.Content);
+                cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+
+                requestId = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+
+            // lấy câu trả lời từ bảng chatdefault
+            string responseText;
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("SELECT answer FROM chatdefault WHERE question = @question", conn);
+                cmd.Parameters.AddWithValue("@question", message.Content);
+                var answer = cmd.ExecuteScalar();
+                responseText = answer?.ToString() ?? "Xin lỗi, tôi không thể hiểu yêu cầu của bạn! Mô hình của tôi không đủ thông minh để xử lý yêu cầu này.";
+            }
+
+            // lưu thông tin vào bảng chatdata với type = "response"
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand(
+                    "INSERT INTO chatdata (userId, content, type, responseChatId, createdAt) VALUES (@userId, @content, 'response', @responseChatId, @createdAt)",
+                    conn
+                );
+                cmd.Parameters.AddWithValue("@userId", int.Parse(userId));
+                cmd.Parameters.AddWithValue("@content", responseText);
+                cmd.Parameters.AddWithValue("@responseChatId", requestId);
+                cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+                cmd.ExecuteNonQuery();
+            }
+
+            return Ok(new
+            {
+                Request = message.Content,
+                Response = responseText
+            });
+        }
+
         private async Task<string> GetChatResponse(string prompt)
         {
             var payload = new
