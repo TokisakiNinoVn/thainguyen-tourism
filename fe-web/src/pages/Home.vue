@@ -3,6 +3,7 @@
       <!-- Header -->
       <h1>✌️Chào mừng bạn đến với website du lịch  tỉnh Thái Nguyên!</h1>
       <NavbarComponentV1 />
+      <Banner />
 
       <!-- Banner page -->
       
@@ -20,12 +21,14 @@
   import { useRouter } from 'vue-router';
   import NavbarComponentV1 from '@/components/NavbarComponentV1.vue';
   import FooterComponent from '@/components/FooterComponent.vue';
+  import Banner from '@/components/Banner.vue';
   
   export default {
     name: 'App',
     components: {
       NavbarComponentV1,
       FooterComponent,
+      Banner,
     },
     setup() {
       const router = useRouter();

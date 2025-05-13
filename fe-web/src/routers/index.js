@@ -18,6 +18,9 @@ import DetailsPlace from '@/pages/place/DetailsPlace.vue';
 import DetailsPlaceMedia from '@/pages/place/DetailsPlaceMedia.vue';
 import ChatPage from '@/pages/chat/ChatPage.vue';
 import CreateBlog from '@/pages/blog/CreateBlog.vue';
+import ListBlog from '@/pages/blog/ListBlog.vue';
+import DetailsBlog from '@/pages/blog/DetailsBlog.vue';
+
 const routes = [
   { path: '/', component: Home },
   { path: '/blank', component: BlankPage },
@@ -27,6 +30,9 @@ const routes = [
   { path: '/places', component: ListPlace },
   { path: '/places/:id', component: DetailsPlace },
   { path: '/places/media/:id', component: DetailsPlaceMedia },
+
+  { path: '/blogs', component: ListBlog },
+  { path: '/blog/detail/:id', component: DetailsBlog },
   // { path: '/complaints-management', component: ComplaintsManagementPage },
   // { path: '/customer-list', component: CustomerManagerment },
   // { path: '/user', component: InforPage },

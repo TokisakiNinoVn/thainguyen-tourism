@@ -186,41 +186,33 @@ const submitForm = async () => {
             title: blog.value.title,
             content: blog.value.content,
             place: blog.value.place,
-            // place: ''
-            // status: blog.value.status,
-            // authorId: blog.value.authorId,
-            // thumbnail: null, // Will be updated after upload
         };
 
         const response = await postCreatBlogApi(blogData);
-        if (response.code === 200 && response.data?.id) {
-            const blogId = response.data.id;
+        const blogId = response.data.data.id;
 
-            // Upload thumbnail
-            const thumbnailFormData = new FormData();
-            thumbnailFormData.append('BlogId', blogId);
-            thumbnailFormData.append('Type', 1); // 1 for image
-            thumbnailFormData.append('ImageFor', 'thumbnail');
-            thumbnailFormData.append('File', thumbnailFile.value);
+        // Upload thumbnail
+        const thumbnailFormData = new FormData();
+        thumbnailFormData.append('BlogId', blogId);
+        thumbnailFormData.append('Type', 1); // 1 for image
+        thumbnailFormData.append('ImageFor', 'thumbnail');
+        thumbnailFormData.append('File', thumbnailFile.value);
 
-            await uploadSingleFileApi(thumbnailFormData);
+        await uploadSingleFileApi(thumbnailFormData);
 
-            // Upload media files
-            for (const file of mediaFiles.value) {
-                const mediaFormData = new FormData();
-                mediaFormData.append('BlogId', blogId);
-                mediaFormData.append('Type', file.type.startsWith('image/') ? 1 : 2); // 1 for image, 2 for video
-                mediaFormData.append('ImageFor', 'media');
-                mediaFormData.append('File', file);
+        // Upload media files
+        for (const file of mediaFiles.value) {
+            const mediaFormData = new FormData();
+            mediaFormData.append('BlogId', blogId);
+            mediaFormData.append('Type', file.type.startsWith('image/') ? 1 : 2);
+            mediaFormData.append('ImageFor', 'media');
+            mediaFormData.append('File', file);
 
-                await uploadSingleFileApi(mediaFormData);
-            }
-
-            alert('Blog created successfully!');
-            router.push('/blogs'); // Redirect to blog list or another page
-        } else {
-            throw new Error('Failed to create blog.');
+            await uploadSingleFileApi(mediaFormData);
         }
+
+        alert('Blog created successfully!');
+        router.push('/');
     } catch (error) {
         console.error('Error creating blog:', error);
         alert('An error occurred while creating the blog.');

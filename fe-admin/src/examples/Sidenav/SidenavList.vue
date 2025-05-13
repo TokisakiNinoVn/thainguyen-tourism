@@ -79,7 +79,7 @@ const getRoute = () => {
         </sidenav-item>
       </li>
 
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <sidenav-item
           to="/billing"
           :class="getRoute() === 'billing' ? 'active' : ''"
@@ -89,7 +89,7 @@ const getRoute = () => {
             <i class="ni ni-image text-success text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
 
       <!-- <li class="mt-3 nav-item">
         <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
@@ -97,7 +97,7 @@ const getRoute = () => {
         </h6>
       </li> -->
 
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <sidenav-item
           to="/profile"
           :class="getRoute() === 'profile' ? 'active' : ''"
@@ -107,7 +107,7 @@ const getRoute = () => {
             <i class="ni ni-single-02 text-info text-sm opacity-10"></i>
           </template>
         </sidenav-item>
-      </li>
+      </li> -->
 
       <li class="nav-item">
         <sidenav-item

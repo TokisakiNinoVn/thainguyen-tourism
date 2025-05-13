@@ -5,8 +5,9 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
-using dbConfig;
 using System.Security.Claims;
+using dbConfig;
+using System.Data;
 
 namespace BE.Controllers
 {
@@ -21,70 +22,224 @@ namespace BE.Controllers
             _env = env;
         }
 
-        [HttpGet]
+        [HttpGet("list")]
         public IActionResult GetListAllBlogs()
         {
-            var blogs = new List<object>();
+            var blogs = new List<Dictionary<string, object>>();
 
             using (var conn = DbConfig.GetConnection())
             {
                 conn.Open();
-                var cmd = new MySqlCommand("SELECT id, title, status, authorId, thumbnail, createdAt, updatedAt FROM blogs", conn);
+                var cmd = new MySqlCommand("SELECT id, title, place, content, authorId, thumbnail, createdAt, updatedAt FROM blogs", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        blogs.Add(new
+                        var blog = new Dictionary<string, object>
                         {
-                            Id = reader["id"],
-                            Title = reader["title"],
-                            Status = reader["status"],
-                            AuthorId = reader["authorId"],
-                            Thumbnail = reader["thumbnail"],
-                            CreatedAt = reader["createdAt"],
-                            UpdatedAt = reader["updatedAt"]
-                        });
+                            { "Id", reader.GetInt32("id") },
+                            { "Title", reader.GetString("title") },
+                            { "Place", reader.GetString("place") },
+                            { "Content", reader.GetString("content") },
+                            // { "Status", reader.GetString("status") },
+                            { "AuthorId", reader.GetInt32("authorId") },
+                            { "Thumbnail", reader.GetInt32("thumbnail") },
+                            { "CreatedAt", reader.GetDateTime("createdAt") },
+                            { "UpdatedAt", reader.GetDateTime("updatedAt") }
+                        };
+                        blogs.Add(blog);
                     }
+                }
+
+                // Close the reader before executing another command
+                foreach (var blog in blogs)
+                {
+                    var mediaList = new List<object>();
+                    using (var mediaCmd = new MySqlCommand("SELECT id, blogId, mediaUrl, mediaType, imageFor FROM blogmedia WHERE blogId = @blogId AND imageFor = 'thumbnail'", conn))
+                    {
+                        mediaCmd.Parameters.AddWithValue("@blogId", blog["Id"]);
+                        using (var mediaReader = mediaCmd.ExecuteReader())
+                        {
+                            while (mediaReader.Read())
+                            {
+                                mediaList.Add(new
+                                {
+                                    Id = mediaReader.GetInt32("id"),
+                                    BlogId = mediaReader.GetInt32("blogId"),
+                                    MediaUrl = mediaReader.GetString("mediaUrl"),
+                                    MediaType = mediaReader.GetInt32("mediaType"),
+                                    ImageFor = mediaReader.GetString("imageFor"),
+                                });
+                            }
+                        }
+                    }
+                    blog["MediaList"] = mediaList;
                 }
             }
 
             return Ok(blogs);
         }
 
-        [HttpGet("{id}")]
+        // [HttpGet("details/{id}")]
+        // public IActionResult GetBlogDetail(int id)
+        // {
+        //     using (var conn = DbConfig.GetConnection())
+        //     {
+        //         conn.Open();
+        //         var cmd = new MySqlCommand("SELECT id, title, content, place, status, authorId, thumbnail, createdAt, updatedAt FROM blogs WHERE id = @id", conn);
+        //         cmd.Parameters.AddWithValue("@id", id);
+
+        //         using var reader = cmd.ExecuteReader();
+        //         if (reader.Read())
+        //         {
+        //             var blog = new
+        //             {
+        //                 Id = reader.GetInt32("id"),
+        //                 Title = reader.GetString("title"),
+        //                 Content = reader.GetString("content"),
+        //                 Status = reader.GetString("status"),
+        //                 AuthorId = reader.GetInt32("authorId"),
+        //                 Place = reader.GetString("place"),
+        //                 Thumbnail = reader.GetInt32("thumbnail"),
+        //                 CreatedAt = reader.GetDateTime("createdAt"),
+        //                 UpdatedAt = reader.GetDateTime("updatedAt")
+        //             };
+
+        //             // Lưu thông tin blog tạm thời để sử dụng sau khi reader bị đóng
+        //             var blogData = blog;
+
+        //             // Đóng reader trước khi thực hiện câu lệnh khác
+        //             reader.Close();
+
+        //             // Get media list for the blog
+        //             var mediaList = new List<object>();
+        //             using (var mediaCmd = new MySqlCommand("SELECT id, blogId, mediaUrl, mediaType, imageFor FROM blogmedia WHERE blogId = @blogId", conn))
+        //             {
+        //                 mediaCmd.Parameters.AddWithValue("@blogId", id);
+        //                 using (var mediaReader = mediaCmd.ExecuteReader())
+        //                 {
+        //                     while (mediaReader.Read())
+        //                     {
+        //                         mediaList.Add(new
+        //                         {
+        //                             Id = mediaReader.GetInt32("id"),
+        //                             BlogId = mediaReader.GetInt32("blogId"),
+        //                             MediaUrl = mediaReader.GetString("mediaUrl"),
+        //                             MediaType = mediaReader.GetInt32("mediaType"),
+        //                             ImageFor = mediaReader.GetString("imageFor"),
+        //                         });
+        //                     }
+        //                 }
+        //             }
+
+        //             // Trả về object kết hợp blog và media list
+        //             var result = new
+        //             {
+        //                 blogData.Id,
+        //                 blogData.Title,
+        //                 blogData.Content,
+        //                 blogData.Status,
+        //                 blogData.AuthorId,
+        //                 blogData.Thumbnail,
+        //                 blogData.CreatedAt,
+        //                 blogData.UpdatedAt,
+        //                 MediaList = mediaList
+        //             };
+
+        //             return Ok(result);
+        //         }
+        //         return NotFound(new { message = "Blog không tồn tại." });
+        //     }
+        // }
+        [HttpGet("details/{id}")]
         public IActionResult GetBlogDetail(int id)
         {
             using (var conn = DbConfig.GetConnection())
             {
                 conn.Open();
-                var cmd = new MySqlCommand("SELECT id, title, content, status, authorId, thumbnail, createdAt, updatedAt FROM blogs WHERE id = @id", conn);
+                var cmd = new MySqlCommand("SELECT id, title, content, place, status, authorId, thumbnail, createdAt, updatedAt FROM blogs WHERE id = @id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
 
-                using (var reader = cmd.ExecuteReader())
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
                 {
-                    if (reader.Read())
+                    var blog = new
                     {
-                        var blog = new
-                        {
-                            Id = reader["id"],
-                            Title = reader["title"],
-                            Content = reader["content"],
-                            Status = reader["status"],
-                            AuthorId = reader["authorId"],
-                            Thumbnail = reader["thumbnail"],
-                            CreatedAt = reader["createdAt"],
-                            UpdatedAt = reader["updatedAt"]
-                        };
+                        Id = reader.GetInt32("id"),
+                        Title = reader.GetString("title"),
+                        Content = reader.GetString("content"),
+                        Status = reader.GetString("status"),
+                        AuthorId = reader.GetInt32("authorId"),
+                        Place = reader.GetString("place"),
+                        Thumbnail = reader.GetInt32("thumbnail"),
+                        CreatedAt = reader.GetDateTime("createdAt"),
+                        UpdatedAt = reader.GetDateTime("updatedAt")
+                    };
 
-                        return Ok(blog);
-                    }
-                    else
+                    var blogData = blog;
+                    reader.Close();
+
+                    // Lấy thông tin tác giả
+                    string? displayName = null;
+                    string? photoUrl = null;
+
+                    using (var userCmd = new MySqlCommand("SELECT displayName, photoUrl FROM users WHERE id = @userId", conn))
                     {
-                        return NotFound(new { message = "Blog không tồn tại." });
+                        userCmd.Parameters.AddWithValue("@userId", blogData.AuthorId);
+                        using (var userReader = userCmd.ExecuteReader())
+                        {
+                            if (userReader.Read())
+                            {
+                                displayName = userReader.IsDBNull("displayName") ? null : userReader.GetString("displayName");
+                                photoUrl = userReader.IsDBNull("photoUrl") ? null : userReader.GetString("photoUrl");
+                            }
+                        }
                     }
+
+                    // Lấy danh sách media
+                    var mediaList = new List<object>();
+                    using (var mediaCmd = new MySqlCommand("SELECT id, blogId, mediaUrl, mediaType, imageFor FROM blogmedia WHERE blogId = @blogId", conn))
+                    {
+                        mediaCmd.Parameters.AddWithValue("@blogId", id);
+                        using (var mediaReader = mediaCmd.ExecuteReader())
+                        {
+                            while (mediaReader.Read())
+                            {
+                                mediaList.Add(new
+                                {
+                                    Id = mediaReader.GetInt32("id"),
+                                    BlogId = mediaReader.GetInt32("blogId"),
+                                    MediaUrl = mediaReader.GetString("mediaUrl"),
+                                    MediaType = mediaReader.GetInt32("mediaType"),
+                                    ImageFor = mediaReader.GetString("imageFor"),
+                                });
+                            }
+                        }
+                    }
+
+                    var result = new
+                    {
+                        blogData.Id,
+                        blogData.Title,
+                        blogData.Content,
+                        blogData.Status,
+                        blogData.AuthorId,
+                        AuthorName = displayName,
+                        AuthorPhoto = photoUrl,
+                        blogData.Place,
+                        blogData.Thumbnail,
+                        blogData.CreatedAt,
+                        blogData.UpdatedAt,
+                        MediaList = mediaList
+                    };
+
+                    return Ok(result);
                 }
+                return NotFound(new { message = "Blog không tồn tại." });
             }
         }
+
+
 
         [HttpGet("reviews/{id}")]
         public IActionResult GetReviewsByBlogId(int id)
@@ -103,13 +258,13 @@ namespace BE.Controllers
                     {
                         reviews.Add(new
                         {
-                            Id = reader["id"],
-                            BlogId = reader["blogId"],
-                            UserId = reader["userId"],
-                            Rating = reader["rating"],
-                            ReviewDescription = reader["reviewDescription"],
-                            CreatedAt = reader["createdAt"],
-                            UpdatedAt = reader["updatedAt"]
+                            Id = reader.GetInt32("id"),
+                            BlogId = reader.GetInt32("blogId"),
+                            UserId = reader.GetInt32("userId"),
+                            Rating = reader.GetInt32("rating"),
+                            ReviewDescription = reader.GetString("reviewDescription"),
+                            CreatedAt = reader.GetDateTime("createdAt"),
+                            UpdatedAt = reader.GetDateTime("updatedAt")
                         });
                     }
                 }
@@ -122,37 +277,34 @@ namespace BE.Controllers
         public IActionResult CreateBlog([FromBody] Blog blog)
         {
             var authorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (authorId == null)
+            if (string.IsNullOrEmpty(authorId))
             {
                 return Unauthorized(new { message = "Unauthorized" });
             }
 
-            using var conn = DbConfig.GetConnection();
-            conn.Open();
-
-            // Sử dụng parameterized query để tránh SQL injection
-            var cmd = new MySqlCommand("INSERT INTO blogs (title, place, content, status, authorId, thumbnail, createdAt, updatedAt) VALUES (@title, @place, @content, @status, @authorId, @thumbnail, @createdAt, @updatedAt); SELECT LAST_INSERT_ID();", conn);
-            cmd.Parameters.AddWithValue("@title", blog.Title);
-            cmd.Parameters.AddWithValue("@place", blog.Place);
-            cmd.Parameters.AddWithValue("@content", blog.Content);
-            cmd.Parameters.AddWithValue("@status", blog.Status);
-            cmd.Parameters.AddWithValue("@authorId", authorId); // Sử dụng authorId từ token, không phải từ body
-            cmd.Parameters.AddWithValue("@thumbnail", blog.Thumbnail.GetValueOrDefault()); // Xử lý thumbnail null hoặc rỗng
-            cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
-            cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
-
-            // Thực thi truy vấn và lấy ID vừa được tạo
-            long lastInsertedId = Convert.ToInt64(cmd.ExecuteScalar());
-
-            if (lastInsertedId > 0)
+            using (var conn = DbConfig.GetConnection())
             {
-                return Ok(new
+                conn.Open();
+                var cmd = new MySqlCommand(
+                    "INSERT INTO blogs (title, place, content, status, authorId, thumbnail, createdAt, updatedAt) " +
+                    "VALUES (@title, @place, @content, @status, @authorId, @thumbnail, @createdAt, @updatedAt); " +
+                    "SELECT LAST_INSERT_ID();", conn);
+
+                cmd.Parameters.AddWithValue("@title", blog.Title ?? string.Empty);
+                cmd.Parameters.AddWithValue("@place", blog.Place ?? string.Empty);
+                cmd.Parameters.AddWithValue("@content", blog.Content ?? string.Empty);
+                cmd.Parameters.AddWithValue("@status", blog.Status ?? "draft");
+                cmd.Parameters.AddWithValue("@authorId", int.Parse(authorId));
+                cmd.Parameters.AddWithValue("@thumbnail", blog.Thumbnail.HasValue ? blog.Thumbnail : (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+
+                var lastInsertedId = Convert.ToInt64(cmd.ExecuteScalar());
+
+                if (lastInsertedId > 0)
                 {
-                    id = lastInsertedId,
-                });
-            }
-            else
-            {
+                    return Ok(new { id = lastInsertedId });
+                }
                 return BadRequest(new { message = "Failed to create blog." });
             }
         }
@@ -170,8 +322,7 @@ namespace BE.Controllers
                 return BadRequest(new { message = "ImageFor must be 'thumbnail' or 'media'" });
 
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
+            Directory.CreateDirectory(uploadsFolder);
 
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.File.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
@@ -181,38 +332,31 @@ namespace BE.Controllers
                 await request.File.CopyToAsync(stream);
             }
 
-            var media = new BlogMedia
-            {
-                BlogId = request.BlogId,
-                MediaUrl = $"/uploads/{fileName}",
-                MediaType = request.Type,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                ImageFor = request.ImageFor
-            };
-
             using (var conn = DbConfig.GetConnection())
             {
                 conn.Open();
-                var cmd = new MySqlCommand("INSERT INTO blog_media (blogId, mediaUrl, mediaType, createdAt, updatedAt, imageFor) VALUES (@blogId, @mediaUrl, @mediaType, @createdAt, @updatedAt, @imageFor)", conn);
-                cmd.Parameters.AddWithValue("@blogId", media.BlogId);
-                cmd.Parameters.AddWithValue("@mediaUrl", media.MediaUrl);
-                cmd.Parameters.AddWithValue("@mediaType", media.MediaType);
-                cmd.Parameters.AddWithValue("@createdAt", media.CreatedAt);
-                cmd.Parameters.AddWithValue("@updatedAt", media.UpdatedAt);
-                cmd.Parameters.AddWithValue("@imageFor", media.ImageFor);
+                var cmd = new MySqlCommand(
+                    "INSERT INTO blogmedia (blogId, mediaUrl, mediaType, createdAt, updatedAt, imageFor) " +
+                    "VALUES (@blogId, @mediaUrl, @mediaType, @createdAt, @updatedAt, @imageFor); " +
+                    "SELECT LAST_INSERT_ID();", conn);
 
-                var result = cmd.ExecuteNonQuery();
-                if (result > 0)
+                cmd.Parameters.AddWithValue("@blogId", request.BlogId);
+                cmd.Parameters.AddWithValue("@mediaUrl", $"/uploads/{fileName}");
+                cmd.Parameters.AddWithValue("@mediaType", request.Type);
+                cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@imageFor", request.ImageFor);
+
+                var mediaId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                if (mediaId > 0)
                 {
-                    media.Id = (int)cmd.LastInsertedId;
-
-                    // If the upload is for a thumbnail, update the blog's thumbnail field
-                    if (media.ImageFor == "thumbnail")
+                    if (request.ImageFor == "thumbnail")
                     {
-                        var updateCmd = new MySqlCommand("UPDATE blogs SET thumbnail = @thumbnailId WHERE id = @blogId", conn);
-                        updateCmd.Parameters.AddWithValue("@thumbnailId", media.Id);
-                        updateCmd.Parameters.AddWithValue("@blogId", media.BlogId);
+                        var updateCmd = new MySqlCommand(
+                            "UPDATE blogs SET thumbnail = @mediaId WHERE id = @blogId", conn);
+                        updateCmd.Parameters.AddWithValue("@mediaId", mediaId);
+                        updateCmd.Parameters.AddWithValue("@blogId", request.BlogId);
                         updateCmd.ExecuteNonQuery();
                     }
 
@@ -221,20 +365,17 @@ namespace BE.Controllers
                         message = "File uploaded successfully.",
                         media = new
                         {
-                            media.Id,
-                            media.BlogId,
-                            media.MediaUrl,
-                            media.MediaType,
-                            media.CreatedAt,
-                            media.UpdatedAt,
-                            media.ImageFor
+                            Id = mediaId,
+                            BlogId = request.BlogId,
+                            MediaUrl = $"/uploads/{fileName}",
+                            MediaType = request.Type,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            ImageFor = request.ImageFor
                         }
                     });
                 }
-                else
-                {
-                    return BadRequest(new { message = "Failed to save media." });
-                }
+                return BadRequest(new { message = "Failed to save media." });
             }
         }
 
@@ -244,42 +385,80 @@ namespace BE.Controllers
             using (var conn = DbConfig.GetConnection())
             {
                 conn.Open();
-
-                // Check if the media is a thumbnail
-                var checkCmd = new MySqlCommand("SELECT blogId, imageFor FROM blog_media WHERE id = @id", conn);
+                var checkCmd = new MySqlCommand("SELECT blogId, imageFor, mediaUrl FROM blogmedia WHERE id = @id", conn);
                 checkCmd.Parameters.AddWithValue("@id", id);
+
                 int? blogId = null;
                 string? imageFor = null;
+                string? mediaUrl = null;
+
                 using (var reader = checkCmd.ExecuteReader())
                 {
                     if (reader.Read())
                     {
                         blogId = reader.IsDBNull(reader.GetOrdinal("blogId")) ? null : reader.GetInt32("blogId");
                         imageFor = reader.IsDBNull(reader.GetOrdinal("imageFor")) ? null : reader.GetString("imageFor");
+                        mediaUrl = reader.IsDBNull(reader.GetOrdinal("mediaUrl")) ? null : reader.GetString("mediaUrl");
+                    }
+                    else
+                    {
+                        return NotFound(new { message = "File not found." });
                     }
                 }
 
-                // Delete the media
-                var cmd = new MySqlCommand("DELETE FROM blog_media WHERE id = @id", conn);
+                var cmd = new MySqlCommand("DELETE FROM blogmedia WHERE id = @id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
 
                 var result = cmd.ExecuteNonQuery();
                 if (result > 0)
                 {
-                    // If it was a thumbnail, update the blog's thumbnail field to NULL
                     if (imageFor == "thumbnail" && blogId.HasValue)
                     {
-                        var updateCmd = new MySqlCommand("UPDATE blogs SET thumbnail = NULL WHERE id = @blogId", conn);
+                        var updateCmd = new MySqlCommand(
+                            "UPDATE blogs SET thumbnail = NULL WHERE id = @blogId", conn);
                         updateCmd.Parameters.AddWithValue("@blogId", blogId.Value);
                         updateCmd.ExecuteNonQuery();
                     }
 
+                    // Delete physical file
+                    if (!string.IsNullOrEmpty(mediaUrl))
+                    {
+                        var filePath = Path.Combine(_env.WebRootPath, mediaUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
+
                     return Ok(new { message = "File deleted successfully." });
                 }
-                else
+                return NotFound(new { message = "File not found." });
+            }
+        }
+
+        // Update blog
+        [HttpPut("update/{id}")]
+        public IActionResult UpdateBlog(int id, [FromBody] Blog blog)
+        {
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand(
+                    "UPDATE blogs SET title = @title, place = @place, content = @content, updatedAt = @updatedAt WHERE id = @id", conn);
+
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@title", blog.Title ?? string.Empty);
+                cmd.Parameters.AddWithValue("@place", blog.Place ?? string.Empty);
+                cmd.Parameters.AddWithValue("@content", blog.Content ?? string.Empty);
+                // cmd.Parameters.AddWithValue("@status", blog.Status ?? "draft");
+                cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+
+                var result = cmd.ExecuteNonQuery();
+                if (result > 0)
                 {
-                    return NotFound(new { message = "File not found." });
+                    return Ok(new { message = "Blog updated successfully." });
                 }
+                return NotFound(new { message = "Blog not found." });
             }
         }
     }
@@ -292,7 +471,7 @@ namespace BE.Controllers
         public string Content { get; set; } = string.Empty;
         public string Status { get; set; } = "draft";
         public int AuthorId { get; set; }
-        public int? Thumbnail { get; set; } = 0;
+        public int? Thumbnail { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
@@ -300,8 +479,8 @@ namespace BE.Controllers
     public class UploadThumbnailRequest
     {
         public int BlogId { get; set; }
-        public int Type { get; set; } // 1: image, 2: video, etc.
-        public string ImageFor { get; set; } = string.Empty; // thumbnail, media
+        public int Type { get; set; }
+        public string ImageFor { get; set; } = string.Empty;
         public required IFormFile File { get; set; }
     }
 
@@ -310,9 +489,9 @@ namespace BE.Controllers
         public int Id { get; set; }
         public int BlogId { get; set; }
         public string MediaUrl { get; set; } = string.Empty;
-        public int MediaType { get; set; } // 1: image, 2: video
+        public int MediaType { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string ImageFor { get; set; } = string.Empty; // thumbnail, media
+        public string ImageFor { get; set; } = string.Empty;
     }
 }
