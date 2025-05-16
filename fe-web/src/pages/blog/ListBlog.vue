@@ -54,10 +54,10 @@
               </div>
               <h3 class="blog-title">{{ blog.Title }}</h3>
               <p class="blog-description" v-html="getShortDescription(blog.Content)"></p>
-              <div class="rating">
+              <!-- <div class="rating">
                 <span class="star-icon">★</span>
                 <span>{{ blog.Rating || '4.5' }}</span>
-              </div>
+              </div> -->
             </div>
           </router-link>
         </div>
@@ -93,6 +93,7 @@
     try {
       const response = await getAllBlogApi();
       listBlog.value = JSON.parse(response.data.data);
+      console.log('List of places:', listBlog.value);
     } catch (error) {
       console.error('Error fetching list of places:', error);
     }

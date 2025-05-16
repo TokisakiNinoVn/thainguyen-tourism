@@ -30,7 +30,7 @@ namespace BE.Controllers
             using (var conn = DbConfig.GetConnection())
             {
                 conn.Open();
-                var cmd = new MySqlCommand("SELECT id, title, place, content, authorId, thumbnail, createdAt, updatedAt FROM blogs", conn);
+                var cmd = new MySqlCommand("SELECT id, title, place, content, authorId, thumbnail, createdAt, updatedAt, category FROM blogs", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -41,11 +41,11 @@ namespace BE.Controllers
                             { "Title", reader.GetString("title") },
                             { "Place", reader.GetString("place") },
                             { "Content", reader.GetString("content") },
-                            // { "Status", reader.GetString("status") },
                             { "AuthorId", reader.GetInt32("authorId") },
                             { "Thumbnail", reader.GetInt32("thumbnail") },
                             { "CreatedAt", reader.GetDateTime("createdAt") },
-                            { "UpdatedAt", reader.GetDateTime("updatedAt") }
+                            { "UpdatedAt", reader.GetDateTime("updatedAt") },
+                            { "Category", reader.GetInt32("category") }
                         };
                         blogs.Add(blog);
                     }
@@ -239,8 +239,6 @@ namespace BE.Controllers
             }
         }
 
-
-
         [HttpGet("reviews/{id}")]
         public IActionResult GetReviewsByBlogId(int id)
         {
@@ -286,8 +284,8 @@ namespace BE.Controllers
             {
                 conn.Open();
                 var cmd = new MySqlCommand(
-                    "INSERT INTO blogs (title, place, content, status, authorId, thumbnail, createdAt, updatedAt) " +
-                    "VALUES (@title, @place, @content, @status, @authorId, @thumbnail, @createdAt, @updatedAt); " +
+                    "INSERT INTO blogs (title, place, content, status, authorId, thumbnail, createdAt, updatedAt, category) " +
+                    "VALUES (@title, @place, @content, @status, @authorId, @thumbnail, @createdAt, @updatedAt, @category); " +
                     "SELECT LAST_INSERT_ID();", conn);
 
                 cmd.Parameters.AddWithValue("@title", blog.Title ?? string.Empty);
@@ -298,6 +296,7 @@ namespace BE.Controllers
                 cmd.Parameters.AddWithValue("@thumbnail", blog.Thumbnail.HasValue ? blog.Thumbnail : (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
                 cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@category", blog.Category);
 
                 var lastInsertedId = Convert.ToInt64(cmd.ExecuteScalar());
 
@@ -461,6 +460,83 @@ namespace BE.Controllers
                 return NotFound(new { message = "Blog not found." });
             }
         }
+
+        // Tạo bình luận
+        [HttpPost("create-comment")]
+        public IActionResult CreateReview([FromBody] CommentBlog commentblog)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Unauthorized" });
+            }
+
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand(
+                    "INSERT INTO blogcomments (blogId, userId, commentContent, createdAt, updatedAt) " +
+                    "VALUES (@blogId, @userId, @commentContent,  @createdAt, @updatedAt);", conn);
+
+                cmd.Parameters.AddWithValue("@blogId", commentblog.BlogId);
+                cmd.Parameters.AddWithValue("@userId", int.Parse(userId));
+                cmd.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@commentContent", commentblog.CommentContent ?? string.Empty);
+
+                var result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                {
+                    return Ok(new { message = "Review created successfully." });
+                }
+                return BadRequest(new { message = "Failed to create review." });
+            }
+        }
+
+
+        // Lấy danh sách bình luận theo blogId
+        [HttpGet("comments/{blogId}")]
+        public IActionResult GetCommentsByBlogId(int blogId)
+        {
+            var comments = new List<object>();
+
+            using (var conn = DbConfig.GetConnection())
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("SELECT id, blogId, userId, commentContent, createdAt, updatedAt FROM blogcomments WHERE blogId = @blogId", conn);
+                cmd.Parameters.AddWithValue("@blogId", blogId);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        comments.Add(new
+                        {
+                            Id = reader.GetInt32("id"),
+                            BlogId = reader.GetInt32("blogId"),
+                            UserId = reader.GetInt32("userId"),
+                            CommentContent = reader.GetString("commentContent"),
+                            CreatedAt = reader.GetDateTime("createdAt"),
+                            UpdatedAt = reader.GetDateTime("updatedAt")
+                        });
+                    }
+                }
+            }
+
+            return Ok(comments);
+        }
+    }
+
+    public class CommentBlog
+    {
+        public int Id { get; set; }
+        public int BlogId { get; set; }
+        public int UserId { get; set; }
+        public string CommentContent { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        public int Status { get; set; } = 0;
     }
 
     public class Blog
@@ -468,6 +544,7 @@ namespace BE.Controllers
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Place { get; set; } = string.Empty;
+        public int Category { get; set; }
         public string Content { get; set; } = string.Empty;
         public string Status { get; set; } = "draft";
         public int AuthorId { get; set; }
