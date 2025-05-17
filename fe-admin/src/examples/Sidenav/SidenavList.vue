@@ -21,7 +21,7 @@ const getRoute = () => {
         <sidenav-item
           to="/dashboard-default"
           :class="getRoute() === 'dashboard-default' ? 'active' : ''"
-          navText="Trang chủ"
+          navText="Báo cáo/Thống kê"
         >
           <template v-slot:icon>
             <i class="ni ni-shop text-primary text-sm opacity-10"></i>
