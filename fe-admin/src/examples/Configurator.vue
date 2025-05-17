@@ -50,7 +50,7 @@ const darkMode = () => {
 
       <div class="pt-3 pb-0 bg-transparent card-header">
         <div class="" :class="isRTL ? 'float-end' : 'float-start'">
-          <h5 class="mt-3 mb-0">Argon Configurator</h5>
+          <h5 class="mt-3 mb-0">Nino Configurator</h5>
           <p>See our dashboard options.</p>
         </div>
         <div
@@ -115,9 +115,11 @@ const darkMode = () => {
           <button
             id="btn-white"
             class="btn w-100 px-3 mb-2"
-            :class="sidebarType === 'bg-white'
-              ? 'bg-gradient-success'
-              : 'btn-outline-success'"
+            :class="
+              sidebarType === 'bg-white'
+                ? 'bg-gradient-success'
+                : 'btn-outline-success'
+            "
             @click="setSidebarType('bg-white')"
           >
             White
@@ -125,9 +127,11 @@ const darkMode = () => {
           <button
             id="btn-dark"
             class="btn w-100 px-3 mb-2"
-            :class="sidebarType === 'bg-default'
-              ? 'bg-gradient-success'
-              : 'btn-outline-success'"
+            :class="
+              sidebarType === 'bg-default'
+                ? 'bg-gradient-success'
+                : 'btn-outline-success'
+            "
             @click="setSidebarType('bg-default')"
           >
             Dark

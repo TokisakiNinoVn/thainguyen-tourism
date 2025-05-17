@@ -50,6 +50,13 @@ public class PlaceController : ControllerBase
                 }
             }
 
+            var reviews = _context.Reviews
+                .Where(r => r.PlaceId == place.Id && r.Status == 1)
+                .ToList();
+
+            double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+            int totalReviews = reviews.Count;
+
             return new
             {
                 place.Id,
@@ -60,9 +67,12 @@ public class PlaceController : ControllerBase
                 place.Thumbnail,
                 place.CreatedAt,
                 place.Province,
-                ImageUrl = imageUrl
+                ImageUrl = imageUrl,
+                AverageRating = averageRating,
+                TotalReviews = totalReviews
             };
         }).ToList();
+
 
         return Ok(new
         {

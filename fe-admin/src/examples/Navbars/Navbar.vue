@@ -1,10 +1,11 @@
 <script setup>
-import { computed, ref } from "vue";
+// import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import Breadcrumbs from "../Breadcrumbs.vue";
 
-const showMenu = ref(false);
+// const showMenu = ref(false);
 const store = useStore();
 const route = useRoute();
 const router = useRouter();
@@ -22,11 +23,11 @@ const currentDirectory = computed(() => {
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
 
-const closeMenu = () => {
-  setTimeout(() => {
-    showMenu.value = false;
-  }, 100);
-};
+// const closeMenu = () => {
+//   setTimeout(() => {
+//     showMenu.value = false;
+//   }, 100);
+// };
 
 const logout = () => {
   if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
@@ -61,7 +62,7 @@ const logout = () => {
           class="pe-md-3 d-flex align-items-center"
           :class="isRTL ? 'me-md-auto' : 'ms-md-auto'"
         >
-          <div class="input-group">
+          <!-- <div class="input-group">
             <span class="input-group-text text-body">
               <i class="fas fa-search" aria-hidden="true"></i>
             </span>
@@ -70,7 +71,7 @@ const logout = () => {
               class="form-control"
               :placeholder="isRTL ? 'أكتب هنا...' : 'Type here...'"
             />
-          </div>
+          </div> -->
         </div>
 
         <ul class="navbar-nav justify-content-end">
@@ -105,7 +106,7 @@ const logout = () => {
             </a>
           </li>
 
-          <li
+          <!-- <li
             class="nav-item dropdown d-flex align-items-center"
             :class="isRTL ? 'ps-2' : 'pe-2'"
           >
@@ -121,8 +122,6 @@ const logout = () => {
             >
               <i class="cursor-pointer fa fa-bell"></i>
             </a>
-
-            <!-- Notification Dropdown -->
             <ul
               class="px-2 py-3 dropdown-menu dropdown-menu-end me-sm-n4"
               :class="showMenu ? 'show' : ''"
@@ -230,7 +229,7 @@ const logout = () => {
                 </a>
               </li>
             </ul>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>

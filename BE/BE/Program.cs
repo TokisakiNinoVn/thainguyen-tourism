@@ -7,6 +7,7 @@ using System.Text;
 using DotNetEnv;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Http.Features;
+using BE.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
+app.UseVisitCounter();
 
 // ======= Middleware Xử lý Exception Toàn Cục =======
 app.Use(async (context, next) =>

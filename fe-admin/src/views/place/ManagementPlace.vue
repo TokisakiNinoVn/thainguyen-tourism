@@ -27,42 +27,32 @@
               <tbody>
                 <tr v-for="place in placeList" :key="place.id">
                   <!-- <td>{{ place.id }}</td> -->
-                  <td >{{ place.thumnail }}
+                  <td>
+                    {{ place.thumnail }}
                     <!-- <img v-if="isInteger(place.thumnail) || place.thumnail !== undefined && place.thumnail !== null"
                       :src="instance.defaults.baseURL + place.thumnail"
                       alt="Thumbnail"
                       class="img-thumbnail"
                       style="width: 100px; height: 100px;"
                     /> -->
-                    <img 
-                      v-if="place.thumbnail !== null && !Number.isInteger(place.thumnail)"
+                    <img
+                      v-if="
+                        place.thumbnail !== null &&
+                        !Number.isInteger(place.thumnail)
+                      "
                       :src="instance.defaults.baseURL + place.imageUrl"
                       alt="Thumbnail"
                       class="img-thumbnail"
-                      style="width: 100px; height: 100px;"
+                      style="width: 100px; height: 100px"
                     />
 
-                    <img v-else
-                        src="https://i.pinimg.com/736x/3e/06/e4/3e06e4b2d23bc6084986ca2804954f3c.jpg"
-                        alt="Placeholder"
-                        class="img-thumbnail"
-                        style="width: 100px;"
-                      />
-                    <!-- <img 
-                      v-if="!Number.isInteger(place.thumnail)"
-                      :src="instance.defaults.baseURL + place.imageUrl"
-                      alt="Thumbnail"
+                    <img
+                      v-else
+                      src="https://i.pinimg.com/736x/3e/06/e4/3e06e4b2d23bc6084986ca2804954f3c.jpg"
+                      alt="Placeholder"
                       class="img-thumbnail"
-                      style="width: 100px; height: 100px;"
+                      style="width: 100px"
                     />
-
-                    <img v-else-if="place.thumnail === null || place.thumnail === undefined"
-                        src="https://i.pinimg.com/736x/3e/06/e4/3e06e4b2d23bc6084986ca2804954f3c.jpg"
-                        alt="Placeholder"
-                        class="img-thumbnail"
-                        style="width: 100px;"
-                      /> -->
-                    <!-- </img> -->
                   </td>
                   <td>{{ place.name }}</td>
                   <td>{{ place.province }}</td>
@@ -70,9 +60,7 @@
                   <td>{{ place.latitude }}</td>
                   <td>{{ formatDate(place.createdAt) }}</td>
                   <td>
-                    <button
-                      class="btn btn-sm btn-primary me-2"
-                    >
+                    <button class="btn btn-sm btn-primary me-2">
                       <router-link :to="`/places/edit/${place.id}`">
                         <i class="fas fa-edit"></i>
                         Sửa
@@ -84,9 +72,7 @@
                     >
                       Xóa
                     </button>
-                    <button
-                      class="btn btn-sm btn-success"
-                      >
+                    <button class="btn btn-sm btn-success">
                       <!-- @click="goToAddMedia(place.id)" -->
                       <router-link :to="`/places/media/${place.id}`">
                         <i class="fas fa-plus"></i>
@@ -148,14 +134,14 @@
 </template>
 
 <script setup>
-import { getListPlaceApi, deletePlaceApi } from '@/apis/modules/place.api';
+import { getListPlaceApi, deletePlaceApi } from "@/apis/modules/place.api";
 // import { useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
-import * as bootstrap from 'bootstrap';
-// import 'bootstrap/dist/css/bootstrap.min.css'; 
+import { ref, onMounted } from "vue";
+import * as bootstrap from "bootstrap";
+// import 'bootstrap/dist/css/bootstrap.min.css';
 // import core-js/core/number
 
-import instance from '@/apis/axiosConfig';
+import instance from "@/apis/axiosConfig";
 // import { isInteger } from 'core-js';
 
 const placeList = ref([]);
@@ -169,32 +155,24 @@ const getListPlace = async () => {
       placeList.value = res.data;
     }
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách địa điểm:', error);
+    console.error("Lỗi khi lấy danh sách địa điểm:", error);
   }
 };
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleString('vi-VN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleString("vi-VN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
-// const goToEdit = (placeId) => {
-//   router.push(`/places/edit/${placeId}`);
-// };
-
-// const goToAddMedia = (placeId) => {
-//   router.push(`/places/${placeId}/media/add`);
-// };
-
 const confirmDelete = (placeId) => {
   placeIdToDelete.value = placeId;
-  const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
   modal.show();
 };
 
@@ -202,15 +180,16 @@ const deletePlaceConfirmed = async () => {
   if (placeIdToDelete.value) {
     try {
       const res = await deletePlaceApi(placeIdToDelete.value);
-      if (res && res.data) {
+      console.log(res.code);
+      if ((res && res.data) || res.code === 200) {
         await getListPlace();
         const modal = bootstrap.Modal.getInstance(
-          document.getElementById('deleteModal')
+          document.getElementById("deleteModal")
         );
         modal.hide();
       }
     } catch (error) {
-      console.error('Lỗi khi xóa địa điểm:', error);
+      console.error("Lỗi khi xóa địa điểm:", error);
     }
   }
 };

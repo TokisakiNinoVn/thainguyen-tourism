@@ -205,11 +205,11 @@ onBeforeUnmount(() => {
           description="<i class='fa fa-arrow-up text-success' aria-hidden='true'></i>
         <span class='font-weight-bold'>24%</span>هذا الشهر"
         >
-          <timeline-item
+          <!-- <timeline-item
             :icon="{ component: 'ni ni-bell-55', color: 'success' }"
             title="$2400, تغييرات في التصميم"
             date-time="22 ديسمبر 7:20 مساءً"
-          />
+          /> -->
           <TimelineItem
             :icon="{ component: 'ni ni-html5', color: 'danger' }"
             title="طلب جديد # 1832412"

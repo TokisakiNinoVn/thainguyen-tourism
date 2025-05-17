@@ -20,46 +20,42 @@ public class AuthWebController : ControllerBase
         _config = config;
     }
 
-    // // POST: api/AuthWeb/login
-    // [HttpPost("login")]
-    // public async Task<IActionResult> Login([FromBody] LoginRequest model)
-    // {
-    //     var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-
-    //     Console.WriteLine($"Login attempt: {model.Email} - {model.Password}");
-
-    //     if (user == null || string.IsNullOrEmpty(user.Password))
-    //         return BadRequest(new { message = "Sai email hoặc mật khẩu" });
-
-    //     bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
-
-    //     if (!isPasswordValid)
-    //         return BadRequest(new { message = "Sai email hoặc mật khẩu" });
-
-    //     return Ok(new { message = "Đăng nhập thành công", data = user });
-    // }
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest model)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
 
-        if (user == null || string.IsNullOrEmpty(user.Password))
+        if (user == null)
+        {
             return BadRequest(new
             {
                 code = 400,
                 status = "error",
-                message = "Sai email hoặc mật khẩu"
+                message = "Email không tồn tại"
             });
+        }
+
+        if (string.IsNullOrEmpty(user.Password))
+        {
+            return BadRequest(new
+            {
+                code = 400,
+                status = "error",
+                message = "Tài khoản chưa có mật khẩu"
+            });
+        }
 
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
 
         if (!isPasswordValid)
+        {
             return BadRequest(new
             {
                 code = 400,
                 status = "error",
-                message = "Sai email hoặc mật khẩu"
+                message = "Mật khẩu không đúng"
             });
+        }
 
         // ===== Lấy JWT config =====
         var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
@@ -97,7 +93,6 @@ public class AuthWebController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var tokenString = tokenHandler.WriteToken(token);
 
-        // ===== Trả về response gọn gàng =====
         return Ok(new
         {
             code = 200,
@@ -110,7 +105,6 @@ public class AuthWebController : ControllerBase
             }
         });
     }
-
 
 
     // POST: api/AuthWeb/register
@@ -126,14 +120,17 @@ public class AuthWebController : ControllerBase
         {
             Email = model.Email,
             Password = hashedPassword,
-            DisplayName = model.FullName,
-            CreatedAt = DateTime.UtcNow
+            DisplayName = model.DisplayName,
+            CreatedAt = DateTime.UtcNow,
+            IsGoogleLogin = 0,
+            Role = "user",
+            PhotoURL = "https://i.pinimg.com/736x/bd/61/ab/bd61ab78ce895f9e57744fe19040253c.jpg"
         };
 
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
 
-        return Ok(new { message = "Đăng ký thành công", data = user });
+        return Ok(new { message = "Đăng ký thành công" });
     }
 
     // POST: api/AuthWeb/forgot-password
@@ -245,7 +242,7 @@ public class AuthWebController : ControllerBase
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public required string FullName { get; set; }
+        public required string DisplayName { get; set; }
     }
 
     public class ForgotPasswordRequest

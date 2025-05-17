@@ -21,6 +21,8 @@ import ChatPage from '@/pages/chat/ChatPage.vue';
 import CreateBlog from '@/pages/blog/CreateBlog.vue';
 import ListBlog from '@/pages/blog/ListBlog.vue';
 import DetailsBlog from '@/pages/blog/DetailsBlog.vue';
+import RegisterPage from '@/pages/RegisterPage.vue';
+
 
 const routes = [
   { path: '/', component: HomePage },
@@ -29,6 +31,7 @@ const routes = [
   { path: '/account', component: AccountInfor, meta: { requiresAuth: true } },
 
   { path: '/login', component: Login },
+  { path: '/register', component: RegisterPage },
   { path: '/places', component: ListPlace },
   { path: '/places/:id', component: DetailsPlace },
   { path: '/places/media/:id', component: DetailsPlaceMedia },

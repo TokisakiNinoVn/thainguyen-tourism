@@ -17,9 +17,9 @@ public class Place
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public double? Latitude { get; set; } // demo: 21.814645988656277
-    public double? Longitude { get; set; } // demo: 105.99999999999999
-    public int? Thumbnail { get; set; } // demo: 1 (id of the image in the database)
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public int? Thumbnail { get; set; }
     public string? Province { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

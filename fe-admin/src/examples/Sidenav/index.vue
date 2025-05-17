@@ -1,4 +1,3 @@
-
 <template>
   <div
     v-show="layout === 'default'"
@@ -50,3 +49,10 @@ const layout = computed(() => store.state.layout);
 const sidebarType = computed(() => store.state.sidebarType);
 const darkMode = computed(() => store.state.darkMode);
 </script>
+
+<style>
+aside {
+  z-index: 99;
+  transition: all 0.3s ease;
+}
+</style>

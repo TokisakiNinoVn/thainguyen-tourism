@@ -14,12 +14,7 @@ const store = useStore();
             ©
             {{ new Date().getFullYear() }}, made with
             <i class="fa fa-heart"></i> by
-            <a
-              href=""
-              class="font-weight-bold"
-              target="_blank"
-              >Tokisaki Nino</a
-            >
+            <a href="" class="font-weight-bold" target="_blank">NH Hoang</a>
             for a better web.
           </div>
         </div>
@@ -28,34 +23,20 @@ const store = useStore();
             class="nav nav-footer justify-content-center justify-content-lg-end"
           >
             <li class="nav-item">
-              <a
-                href=""
-                class="nav-link text-muted"
-                target="_blank"
+              <a href="" class="nav-link text-muted" target="_blank"
                 >Creative Tim</a
               >
             </li>
             <li class="nav-item">
-              <a
-                href=""
-                class="nav-link text-muted"
-                target="_blank"
+              <a href="" class="nav-link text-muted" target="_blank"
                 >About Us</a
               >
             </li>
             <li class="nav-item">
-              <a
-                href=""
-                class="nav-link text-muted"
-                target="_blank"
-                >Blog</a
-              >
+              <a href="" class="nav-link text-muted" target="_blank">Blog</a>
             </li>
             <li class="nav-item">
-              <a
-                href=""
-                class="nav-link pe-0 text-muted"
-                target="_blank"
+              <a href="" class="nav-link pe-0 text-muted" target="_blank"
                 >License</a
               >
             </li>

@@ -37,12 +37,13 @@ const getRoute = () => {
         >
           <template v-slot:icon>
             <!-- <i class="ni ni-pin-3"></i> -->
-            <i class="fa-solid fa-location-crosshairs  text-warning text-sm opacity-10"></i>
+            <i
+              class="fa-solid fa-location-crosshairs text-warning text-sm opacity-10"
+            ></i>
           </template>
         </sidenav-item>
       </li>
-      
-      
+
       <li class="nav-item">
         <sidenav-item
           to="/management-place"
@@ -57,7 +58,7 @@ const getRoute = () => {
 
       <li class="nav-item">
         <sidenav-item
-          to="/add-place"
+          to="/management-blog"
           :class="getRoute() === 'tables' ? 'active' : ''"
           navText="Quản lý bài viết"
         >
@@ -68,55 +69,23 @@ const getRoute = () => {
       </li>
       <li class="nav-item">
         <sidenav-item
+          to="/management-user"
+          :class="getRoute() === 'tables' ? 'active' : ''"
+          navText="Quản lý người dùng"
+        >
+          <template v-slot:icon>
+            <i class="fa-solid fa-users text-warning text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+      <li class="nav-item">
+        <sidenav-item
           to="/review"
           :class="getRoute() === 'tables' ? 'active' : ''"
           navText="Quản lý Đánh giá"
         >
           <template v-slot:icon>
-            <!-- <i class="fa-solid fa-file text-warning text-sm opacity-10"></i> -->
             <i class="fa-solid fa-comment text-warning text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
-      </li>
-
-      <!-- <li class="nav-item">
-        <sidenav-item
-          to="/billing"
-          :class="getRoute() === 'billing' ? 'active' : ''"
-          navText="Vị trí truyền thông"
-        >
-          <template v-slot:icon>
-            <i class="ni ni-image text-success text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
-      </li> -->
-
-      <!-- <li class="mt-3 nav-item">
-        <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
-          TÀI KHOẢN
-        </h6>
-      </li> -->
-
-      <!-- <li class="nav-item">
-        <sidenav-item
-          to="/profile"
-          :class="getRoute() === 'profile' ? 'active' : ''"
-          navText="Hồ sơ"
-        >
-          <template v-slot:icon>
-            <i class="ni ni-single-02 text-info text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
-      </li> -->
-
-      <li class="nav-item">
-        <sidenav-item
-          to="/login"
-          :class="getRoute() === 'login' ? 'active' : ''"
-          navText="Đăng xuất"
-        >
-          <template v-slot:icon>
-            <i class="ni ni-key-25 text-danger text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>

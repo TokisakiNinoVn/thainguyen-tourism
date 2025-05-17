@@ -14,10 +14,20 @@ import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue"; // login page
 
+import ManagementBlog from "@/views/blog/ManagementBlog.vue";
+import DetailsBlog from "@/views/blog/DetailsBlog.vue";
+
+import ManagementUser from "@/views/user/ManagementUser.vue";
+
 // Khai báo routes
 const routes = [
   { path: "/", name: "/", redirect: "/dashboard-default" },
   { path: "/dashboard-default", name: "Dashboard", component: Dashboard, meta: { requiresAuth: true } },
+
+  { path: "/management-blog", name: "ManagementBlog", component: ManagementBlog, meta: { requiresAuth: true } },
+  { path: "/details-blog/:Id", name: "DetailsBlog", component: DetailsBlog, meta: { requiresAuth: true } },
+
+  { path: "/management-user", name: "ManagementUser", component: ManagementUser, meta: { requiresAuth: true } },
 
   { path: "/management-place", name: "ManagementPlace", component: ManagementPlace, meta: { requiresAuth: true } },
   { path: "/add-place", name: "Thêm địa điểm", component: AddPlace, meta: { requiresAuth: true } },

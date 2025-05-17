@@ -87,7 +87,41 @@ namespace Controllers.web.place
             }
         }
 
+        // // Lưu địa điểm/blog với Id của place và id của user
+        // [HttpPost("save")]
+        // public async Task<IActionResult> SavePlace([FromBody] object place)
+        // {
+        //     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //     if (userId == null)
+        //     {
+        //         return Unauthorized();
+        //     }
 
+        //     try
+        //     {
+        //         using (var connection = DbConfig.GetConnection())
+        //         {
+        //             await connection.OpenAsync();
 
+        //             // Lưu địa điểm vào cơ sở dữ liệu
+        //             using (var command = new MySqlCommand("INSERT INTO likesplace (placeId, userId) VALUES (@placeId, @userId)", connection))
+        //             {
+        //                 command.Parameters.AddWithValue("@placeId", place);
+        //                 command.Parameters.AddWithValue("@userId", userId);
+
+        //                 await command.ExecuteNonQueryAsync();
+        //             }
+
+        //             return Ok(new { Message = "Place saved successfully" });
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Error saving place");
+        //         return StatusCode(500, new { Message = "Internal server error" });
+        //     }
+        // }
+
+        
     }
 }

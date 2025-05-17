@@ -1,225 +1,235 @@
-<script setup>
-import MiniStatisticsCard from "@/examples/Cards/MiniStatisticsCard.vue";
-import GradientLineChart from "@/examples/Charts/GradientLineChart.vue";
-import Carousel from "./components/Carousel.vue";
-import CategoriesList from "./components/CategoriesList.vue";
-
-import US from "@/assets/img/icons/flags/US.png";
-import DE from "@/assets/img/icons/flags/DE.png";
-import GB from "@/assets/img/icons/flags/GB.png";
-import BR from "@/assets/img/icons/flags/BR.png";
-
-const sales = {
-  us: {
-    country: "United States",
-    sales: 2500,
-    value: "$230,900",
-    bounce: "29.9%",
-    flag: US,
-  },
-  germany: {
-    country: "Germany",
-    sales: "3.900",
-    value: "$440,000",
-    bounce: "40.22%",
-    flag: DE,
-  },
-  britain: {
-    country: "Great Britain",
-    sales: "1.400",
-    value: "$190,700",
-    bounce: "23.44%",
-    flag: GB,
-  },
-  brasil: {
-    country: "Brasil",
-    sales: "562",
-    value: "$143,960",
-    bounce: "32.14%",
-    flag: BR,
-  },
-};
-</script>
 <template>
-  <div class="py-4 container-fluid">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="row">
-          <div class="col-lg-3 col-md-6 col-12">
-            <mini-statistics-card
-              title="Today's Money"
-              value="$53,000"
-              description="<span
-                class='text-sm font-weight-bolder text-success'
-                >+55%</span> since yesterday"
-              :icon="{
-                component: 'ni ni-money-coins',
-                background: 'bg-gradient-primary',
-                shape: 'rounded-circle',
-              }"
-            />
+  <div class="main-blog__content">
+    <div
+      class="w-[90vw] h-[90vh] rounded-xl shadow-2xl flex flex-col relative overflow-hidden p-6 bg-gradient-to-br from-blue-50 to-indigo-50"
+    >
+      <!-- Header -->
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Bảng Điều Khiển</h1>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div
+          class="bg-white p-5 rounded-xl shadow-lg flex items-center transform hover:scale-105 transition-transform duration-300"
+        >
+          <div class="p-3 rounded-full bg-blue-100 mr-4">
+            <i class="fas fa-users text-blue-600 text-2xl"></i>
           </div>
-          <div class="col-lg-3 col-md-6 col-12">
-            <mini-statistics-card
-              title="Today's Users"
-              value="2,300"
-              description="<span
-                class='text-sm font-weight-bolder text-success'
-                >+3%</span> since last week"
-              :icon="{
-                component: 'ni ni-world',
-                background: 'bg-gradient-danger',
-                shape: 'rounded-circle',
-              }"
-            />
-          </div>
-          <div class="col-lg-3 col-md-6 col-12">
-            <mini-statistics-card
-              title="New Clients"
-              value="+3,462"
-              description="<span
-                class='text-sm font-weight-bolder text-danger'
-                >-2%</span> since last quarter"
-              :icon="{
-                component: 'ni ni-paper-diploma',
-                background: 'bg-gradient-success',
-                shape: 'rounded-circle',
-              }"
-            />
-          </div>
-          <div class="col-lg-3 col-md-6 col-12">
-            <mini-statistics-card
-              title="Sales"
-              value="$103,430"
-              description="<span
-                class='text-sm font-weight-bolder text-success'
-                >+5%</span> than last month"
-              :icon="{
-                component: 'ni ni-cart',
-                background: 'bg-gradient-warning',
-                shape: 'rounded-circle',
-              }"
-            />
+          <div>
+            <p class="text-sm text-gray-500">Tổng Người Dùng</p>
+            <p class="text-2xl font-semibold text-gray-800">{{ userCount }}</p>
           </div>
         </div>
-        <div class="row">
-          <div class="col-lg-7 mb-lg">
-            <!-- line chart -->
-            <div class="card z-index-2">
-              <gradient-line-chart
-                id="chart-line"
-                title="Sales Overview"
-                description="<i class='fa fa-arrow-up text-success'></i>
-      <span class='font-weight-bold'>4% more</span> in 2021"
-                :chart="{
-                  labels: [
-                    'Apr',
-                    'May',
-                    'Jun',
-                    'Jul',
-                    'Aug',
-                    'Sep',
-                    'Oct',
-                    'Nov',
-                    'Dec',
-                  ],
-                  datasets: [
-                    {
-                      label: 'Mobile Apps',
-                      data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    },
-                  ],
-                }"
-              />
-            </div>
+        <div
+          class="bg-white p-5 rounded-xl shadow-lg flex items-center transform hover:scale-105 transition-transform duration-300"
+        >
+          <div class="p-3 rounded-full bg-green-100 mr-4">
+            <i class="fas fa-star text-green-600 text-2xl"></i>
           </div>
-          <div class="col-lg-5">
-            <carousel />
+          <div>
+            <p class="text-sm text-gray-500">Tổng Đánh Giá</p>
+            <p class="text-2xl font-semibold text-gray-800">
+              {{ reviewCount }}
+            </p>
           </div>
         </div>
-        <div class="row mt-4">
-          <div class="col-lg-7 mb-lg-0 mb-4">
-            <div class="card">
-              <div class="p-3 pb-0 card-header">
-                <div class="d-flex justify-content-between">
-                  <h6 class="mb-2">Sales by Country</h6>
-                </div>
-              </div>
-              <div class="table-responsive">
-                <table class="table align-items-center">
-                  <tbody>
-                    <tr v-for="(sale, index) in sales" :key="index">
-                      <td class="w-30">
-                        <div class="px-2 py-1 d-flex align-items-center">
-                          <div>
-                            <img :src="sale.flag" alt="Country flag" />
-                          </div>
-                          <div class="ms-4">
-                            <p class="mb-0 text-xs font-weight-bold">
-                              Country:
-                            </p>
-                            <h6 class="mb-0 text-sm">{{ sale.country }}</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="text-center">
-                          <p class="mb-0 text-xs font-weight-bold">Sales:</p>
-                          <h6 class="mb-0 text-sm">{{ sale.sales }}</h6>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="text-center">
-                          <p class="mb-0 text-xs font-weight-bold">Value:</p>
-                          <h6 class="mb-0 text-sm">{{ sale.value }}</h6>
-                        </div>
-                      </td>
-                      <td class="text-sm align-middle">
-                        <div class="text-center col">
-                          <p class="mb-0 text-xs font-weight-bold">Bounce:</p>
-                          <h6 class="mb-0 text-sm">{{ sale.bounce }}</h6>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        <div
+          class="bg-white p-5 rounded-xl shadow-lg flex items-center transform hover:scale-105 transition-transform duration-300"
+        >
+          <div class="p-3 rounded-full bg-purple-100 mr-4">
+            <i class="fas fa-book text-purple-600 text-2xl"></i>
           </div>
-          <div class="col-lg-5">
-            <categories-list
-              :categories="[
-                {
-                  icon: {
-                    component: 'ni ni-mobile-button',
-                    background: 'dark',
-                  },
-                  label: 'Devices',
-                  description: '250 in stock <strong>346+ sold</strong>',
-                },
-                {
-                  icon: {
-                    component: 'ni ni-tag',
-                    background: 'dark',
-                  },
-                  label: 'Tickets',
-                  description: '123 closed <strong>15 open</strong>',
-                },
-                {
-                  icon: { component: 'ni ni-box-2', background: 'dark' },
-                  label: 'Error logs',
-                  description: '1 is active <strong>40 closed</strong>',
-                },
-                {
-                  icon: { component: 'ni ni-satisfied', background: 'dark' },
-                  label: 'Happy Users',
-                  description: '+ 430',
-                },
-              ]"
-            />
+          <div>
+            <p class="text-sm text-gray-500">Tổng Bài Viết</p>
+            <p class="text-2xl font-semibold text-gray-800">{{ blogCount }}</p>
           </div>
         </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Lượt Truy Cập Hàng Tháng
+        </h2>
+        <apexchart
+          type="area"
+          height="300"
+          :options="chartOptions"
+          :series="series"
+        ></apexchart>
+      </div>
+
+      <!-- Favorite Places -->
+      <div class="bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Địa Điểm Yêu Thích
+        </h2>
+        <ul class="space-y-3">
+          <li
+            v-for="place in listFavoritePlaces"
+            :key="place.name"
+            class="flex justify-between items-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <span class="text-gray-600 flex items-center">
+              <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>
+              {{ place.name }}
+            </span>
+            <span
+              class="text-gray-800 font-semibold bg-blue-100 px-2 py-1 rounded"
+              >{{ place.count }}</span
+            >
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import {
+  getVisitCountApi,
+  getBlogCountApi,
+  getUserCountApi,
+  getReviewCountApi,
+  getListFavoritePlacesApi,
+} from "@/apis/modules/dasboard.api.js";
+
+const visitCount = ref([]);
+const blogCount = ref(0);
+const userCount = ref(0);
+const reviewCount = ref(0);
+const listFavoritePlaces = ref([]);
+
+const chartOptions = ref({
+  chart: {
+    type: "area",
+    height: 300,
+    toolbar: {
+      show: false,
+    },
+    animations: {
+      enabled: true,
+      easing: "easeinout",
+      speed: 800,
+    },
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  stroke: {
+    curve: "smooth",
+    width: 3,
+  },
+  xaxis: {
+    categories: [],
+    title: {
+      text: "Tháng",
+      style: {
+        fontSize: "14px",
+        fontWeight: 600,
+      },
+    },
+  },
+  yaxis: {
+    title: {
+      text: "Số Lượt Truy Cập",
+      style: {
+        fontSize: "14px",
+        fontWeight: 600,
+      },
+    },
+  },
+  fill: {
+    type: "gradient",
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.7,
+      opacityTo: 0.3,
+      stops: [0, 90, 100],
+    },
+  },
+  colors: ["#3B82F6"],
+  tooltip: {
+    y: {
+      formatter: (val) => `${val} lượt truy cập`,
+    },
+  },
+});
+
+const series = ref([
+  {
+    name: "Lượt Truy Cập",
+    data: [],
+  },
+]);
+
+const fecthBlogCount = async () => {
+  try {
+    const response = await getBlogCountApi();
+    blogCount.value = response.data.blogCount;
+  } catch (error) {
+    console.error("Lỗi khi lấy số lượng bài viết:", error);
+  }
+};
+
+const fecthUserCount = async () => {
+  try {
+    const response = await getUserCountApi();
+    userCount.value = response.data.userCount;
+  } catch (error) {
+    console.error("Lỗi khi lấy số lượng người dùng:", error);
+  }
+};
+
+const fecthReviewCount = async () => {
+  try {
+    const response = await getReviewCountApi();
+    reviewCount.value = response.data.reviewCount;
+  } catch (error) {
+    console.error("Lỗi khi lấy số lượng đánh giá:", error);
+  }
+};
+
+const fecthListFavoritePlaces = async () => {
+  try {
+    const response = await getListFavoritePlacesApi();
+    listFavoritePlaces.value = JSON.parse(response.data);
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách địa điểm yêu thích:", error);
+  }
+};
+
+const fecthVisitCount = async () => {
+  try {
+    const response = await getVisitCountApi();
+    visitCount.value = response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy số lượt truy cập:", error);
+  }
+};
+
+const initChart = () => {
+  chartOptions.value.xaxis.categories = visitCount.value.map((item) =>
+    new Date(
+      `20${item.month.slice(2, 4)}-${item.month.slice(0, 2)}-01`
+    ).toLocaleString("default", {
+      month: "short",
+      year: "numeric",
+    })
+  );
+  series.value[0].data = visitCount.value.map((item) => item.count);
+};
+
+onMounted(async () => {
+  await Promise.all([
+    fecthVisitCount(),
+    fecthBlogCount(),
+    fecthUserCount(),
+    fecthReviewCount(),
+    fecthListFavoritePlaces(),
+  ]);
+  if (visitCount.value.length) {
+    initChart();
+  }
+});
+</script>

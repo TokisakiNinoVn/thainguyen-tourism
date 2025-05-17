@@ -3,65 +3,116 @@
     <!-- Main Content -->
     <div class="relative">
       <!-- Left Sidebar (Place Info) -->
-      <div 
+      <div
         :class="{
           'translate-x-0': showLeftMenu,
-          '-translate-x-full': !showLeftMenu
-        }" 
+          '-translate-x-full': !showLeftMenu,
+        }"
         class="fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-40 transition-transform duration-300 overflow-y-auto"
       >
         <div class="p-4">
           <!-- Close/Open Button -->
-          <button 
+          <button
             @click="showLeftMenu = !showLeftMenu"
             class="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
           >
-            <svg v-if="showLeftMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              v-if="showLeftMenu"
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
-            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              v-else
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
 
           <!-- Place Info -->
           <div class="mt-8">
-            <h5 class="text-xl font-semibold text-blue-600">Thông tin địa điểm</h5>
-            <h6 class="text-2xl font-bold mt-4 mb-4">{{ place.name || 'Đang tải...' }}</h6>
+            <h5 class="text-xl font-semibold text-blue-600">
+              Thông tin địa điểm
+            </h5>
+            <h6 class="text-2xl font-bold mt-4 mb-4">
+              {{ place.name || "Đang tải..." }}
+            </h6>
             <img
               v-if="place.imageUrl"
               :src="instance.defaults.baseURL + place.imageUrl"
               alt="Ảnh đại diện"
               class="w-full max-w-md rounded-lg shadow-md mb-4 cursor-pointer"
             />
-            <div v-html="place.description || ''" class="prose max-w-none mb-4"></div>
+            <div
+              v-html="place.description || ''"
+              class="prose max-w-none mb-4"
+            ></div>
             <div class="grid grid-cols-1 gap-4">
-              <p><strong>Vĩ độ:</strong> {{ place.latitude ?? 'N/A' }}</p>
-              <p><strong>Kinh độ:</strong> {{ place.longitude ?? 'N/A' }}</p>
+              <p><strong>Vĩ độ:</strong> {{ place.latitude ?? "N/A" }}</p>
+              <p><strong>Kinh độ:</strong> {{ place.longitude ?? "N/A" }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Right Sidebar (Reviews) -->
-      <div 
+      <div
         :class="{
           'translate-x-0': showRightMenu,
-          'translate-x-full': !showRightMenu
-        }" 
+          'translate-x-full': !showRightMenu,
+        }"
         class="fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-40 transition-transform duration-300 overflow-y-auto"
       >
         <div class="p-4">
           <!-- Close/Open Button -->
-          <button 
+          <button
             @click="showRightMenu = !showRightMenu"
             class="absolute top-4 left-4 text-gray-600 hover:text-gray-800"
           >
-            <svg v-if="showRightMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              v-if="showRightMenu"
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
-            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              v-else
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
 
@@ -84,7 +135,11 @@
                     :key="star"
                     @click="newReview.rating = star"
                     class="text-2xl"
-                    :class="star <= newReview.rating ? 'text-yellow-400' : 'text-gray-300'"
+                    :class="
+                      star <= newReview.rating
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'
+                    "
                   >
                     ★
                   </button>
@@ -123,20 +178,27 @@
                     class="w-10 h-10 rounded-full mr-3"
                     src="https://i.pinimg.com/736x/48/e1/02/48e102b6e1dcf19306de4cc1504b2205.jpg"
                   />
-                  <span class="font-semibold text-lg">{{ review.displayName }}</span>
+                  <span class="font-semibold text-lg">{{
+                    review.displayName
+                  }}</span>
                   <div class="ml-3 flex">
                     <span
                       v-for="star in 5"
                       :key="star"
                       class="text-yellow-400"
                       :class="{ 'opacity-30': star > review.rating }"
-                    >★</span>
+                      >★</span
+                    >
                   </div>
                 </div>
                 <p class="text-gray-600">{{ review.content }}</p>
-                <p class="text-sm text-gray-500 mt-1">{{ formatDate(review.createdAt) }}</p>
+                <p class="text-sm text-gray-500 mt-1">
+                  {{ formatDate(review.createdAt) }}
+                </p>
               </div>
-              <p v-if="!reviews.length" class="text-gray-500">Chưa có đánh giá nào.</p>
+              <p v-if="!reviews.length" class="text-gray-500">
+                Chưa có đánh giá nào.
+              </p>
             </div>
           </div>
         </div>
@@ -147,21 +209,43 @@
         @click="showLeftMenu = !showLeftMenu"
         class="fixed top-1/2 left-0 z-50 bg-blue-500 text-white p-2 rounded-r-lg transform -translate-y-1/2"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
       <button
         @click="showRightMenu = !showRightMenu"
         class="fixed top-1/2 right-0 z-50 bg-blue-500 text-white p-2 rounded-l-lg transform -translate-y-1/2"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
 
       <!-- Main Media Display -->
-      <div class="relative w-full h-screen bg-black flex items-center justify-center">
+      <div
+        class="relative w-full h-screen bg-black flex items-center justify-center"
+      >
         <!-- Media Content -->
         <div class="w-full h-full flex items-center justify-center">
           <img
@@ -185,15 +269,27 @@
 
         <!-- Control Bar -->
         <div class="absolute bottom-4 left-0 right-0 flex justify-center z-30">
-          <div class="bg-gray-800 bg-opacity-75 rounded-lg p-4 flex items-center gap-4">
+          <div
+            class="bg-gray-800 bg-opacity-75 rounded-lg p-4 flex items-center gap-4"
+          >
             <!-- Previous Button -->
             <button
               class="text-white hover:text-gray-300"
               @click="prevMedia"
               title="Media trước"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <!-- Zoom In (360 only) -->
@@ -201,11 +297,25 @@
               class="text-white hover:text-gray-300"
               :disabled="currentMedia?.mediaType !== 2"
               @click="zoomIn"
-              :title="currentMedia?.mediaType === 2 ? 'Phóng to' : 'Không khả dụng'"
-              :class="{ 'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2 }"
+              :title="
+                currentMedia?.mediaType === 2 ? 'Phóng to' : 'Không khả dụng'
+              "
+              :class="{
+                'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2,
+              }"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
             </button>
             <!-- Zoom Out (360 only) -->
@@ -213,11 +323,25 @@
               class="text-white hover:text-gray-300"
               :disabled="currentMedia?.mediaType !== 2"
               @click="zoomOut"
-              :title="currentMedia?.mediaType === 2 ? 'Thu nhỏ' : 'Không khả dụng'"
-              :class="{ 'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2 }"
+              :title="
+                currentMedia?.mediaType === 2 ? 'Thu nhỏ' : 'Không khả dụng'
+              "
+              :class="{
+                'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2,
+              }"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 12H4"
+                />
               </svg>
             </button>
             <!-- Auto Rotate (360 only) -->
@@ -225,15 +349,26 @@
               class="text-white hover:text-gray-300"
               :disabled="currentMedia?.mediaType !== 2"
               @click="toggleAutoRotate"
-              :title="currentMedia?.mediaType === 2 ? (isAutoRotating ? 'Tắt tự động xoay' : 'Bật tự động xoay') : 'Không khả dụng'"
-              :class="{ 'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2 }"
+              :title="
+                currentMedia?.mediaType === 2
+                  ? isAutoRotating
+                    ? 'Tắt tự động xoay'
+                    : 'Bật tự động xoay'
+                  : 'Không khả dụng'
+              "
+              :class="{
+                'opacity-50 cursor-not-allowed': currentMedia?.mediaType !== 2,
+              }"
             >
               <svg
                 class="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                :class="{ 'text-yellow-400': isAutoRotating && currentMedia?.mediaType === 2 }"
+                :class="{
+                  'text-yellow-400':
+                    isAutoRotating && currentMedia?.mediaType === 2,
+                }"
               >
                 <path
                   stroke-linecap="round"
@@ -242,6 +377,23 @@
                   d="M4 4v5h5m0 0l-3-3m3 3l3-3m6 6v5h-5m0 0l3 3m-3-3l-3 3"
                 />
               </svg>
+            </button>
+            <!-- Focus on Hotspot (360 only, when hotspot exists) -->
+            <button
+              class="text-white hover:text-gray-300"
+              :disabled="currentMedia?.mediaType !== 2 || images360.length <= 1"
+              @click="focusOnHotspot"
+              :title="
+                currentMedia?.mediaType === 2 && images360.length > 1
+                  ? 'Xem điểm chuyển ảnh 360'
+                  : 'Không khả dụng'
+              "
+              :class="{
+                'opacity-50 cursor-not-allowed':
+                  currentMedia?.mediaType !== 2 || images360.length <= 1,
+              }"
+            >
+              <i class="fa-solid fa-location-crosshairs w-6 h-6"></i>
             </button>
             <!-- Audio Controls -->
             <button
@@ -334,8 +486,18 @@
               @click="nextMedia"
               title="Media tiếp theo"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -346,12 +508,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { getPlaceByIdApi, getReviewPlaceByIdApi } from '@/services/modules/place.api';
-import { createReviewApi } from '@/services/modules/review.api';
-import { getListMediaPlaceApi } from '@/services/modules/mediaplace.api';
-import instance from '@/services/axiosConfig';
+import { ref, onMounted, watch, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  getPlaceByIdApi,
+  getReviewPlaceByIdApi,
+} from "@/services/modules/place.api";
+import { createReviewApi } from "@/services/modules/review.api";
+import { getListMediaPlaceApi } from "@/services/modules/mediaplace.api";
+import instance from "@/services/axiosConfig";
 
 // Get place ID from route
 const route = useRoute();
@@ -371,7 +536,7 @@ const reviews = ref([]);
 const showReviewForm = ref(false);
 const newReview = ref({
   rating: 0,
-  comment: ''
+  comment: "",
 });
 
 // Sidebar states
@@ -387,26 +552,27 @@ const isMuted = ref(false);
 const audioVolume = ref(0.5);
 const isAutoRotating = ref(true);
 const pannellumViewer = ref(null);
+const hotspotPosition = ref({ pitch: 0, yaw: 0 }); // Store hotspot position
 
 // format date function
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleString('vi-VN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleString("vi-VN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
-  
+
 // Fetch place details
 const fetchPlaceDetails = async () => {
   try {
     const response = await getPlaceByIdApi(placeId);
     place.value = response.data.data || {};
   } catch (error) {
-    console.error('Lỗi khi tải thông tin địa điểm:', error);
+    console.error("Lỗi khi tải thông tin địa điểm:", error);
   }
 };
 
@@ -416,20 +582,20 @@ const fetchReviews = async () => {
     const response = await getReviewPlaceByIdApi(placeId);
     reviews.value = JSON.parse(response.data.data) || [];
   } catch (error) {
-    console.error('Lỗi khi tải đánh giá:', error);
+    console.error("Lỗi khi tải đánh giá:", error);
   }
 };
 
 // Submit review
 const submitReview = async () => {
   if (!newReview.value.rating || !newReview.value.comment.trim()) {
-    alert('Vui lòng chọn số sao và viết nhận xét!');
+    alert("Vui lòng chọn số sao và viết nhận xét!");
     return;
   }
-  const isLogin = localStorage.getItem('isLoggedIn');
-  if (isLogin === 'false') {
-    alert('Vui lòng đăng nhập để gửi đánh giá!');
-    router.push('/login');
+  const isLogin = localStorage.getItem("isLoggedIn");
+  if (isLogin === "false") {
+    alert("Vui lòng đăng nhập để gửi đánh giá!");
+    router.push("/login");
     return;
   }
 
@@ -437,24 +603,26 @@ const submitReview = async () => {
     const payload = {
       placeId: parseInt(placeId),
       rating: newReview.value.rating,
-      reviewDescription: newReview.value.comment
+      reviewDescription: newReview.value.comment,
     };
-    
+
     const response = await createReviewApi(payload);
-    if (response.status === 200) { 
-      newReview.value = { rating: 0, comment: '' };
+    if (response.status === 200) {
+      newReview.value = { rating: 0, comment: "" };
       showReviewForm.value = false;
       await fetchReviews();
-      alert('Đánh giá của bạn đã được gửi thành công! Chúng tôi sẽ sớm duyệt nó.');
+      alert(
+        "Đánh giá của bạn đã được gửi thành công! Chúng tôi sẽ sớm duyệt nó."
+      );
     }
   } catch (error) {
-    console.error('Lỗi khi gửi đánh giá:', error);
-    alert('Đã có lỗi xảy ra khi gửi đánh giá!');
+    console.error("Lỗi khi gửi đánh giá:", error);
+    alert("Đã có lỗi xảy ra khi gửi đánh giá!");
   }
 };
 
 const cancelReview = () => {
-  newReview.value = { rating: 0, comment: '' };
+  newReview.value = { rating: 0, comment: "" };
   showReviewForm.value = false;
 };
 
@@ -474,8 +642,9 @@ const fetchMediaList = async () => {
       initializeAudio();
       initialize360Viewer();
     }
+    console.log("Number of 360 images:", images360.value.length);
   } catch (error) {
-    console.error('Lỗi khi tải danh sách media:', error);
+    console.error("Lỗi khi tải danh sách media:", error);
   }
 };
 
@@ -483,7 +652,8 @@ const fetchMediaList = async () => {
 const prevMedia = () => {
   if (allMedia.value.length > 0) {
     currentMediaIndex.value =
-      (currentMediaIndex.value - 1 + allMedia.value.length) % allMedia.value.length;
+      (currentMediaIndex.value - 1 + allMedia.value.length) %
+      allMedia.value.length;
     currentMedia.value = allMedia.value[currentMediaIndex.value];
     initialize360Viewer();
   }
@@ -498,24 +668,61 @@ const nextMedia = () => {
   }
 };
 
+// Function to jump to next 360 image
+const jumpToNext360 = () => {
+  if (images360.value.length <= 1) return;
+
+  const current360Index = images360.value.findIndex(
+    (media) => media.id === currentMedia.value.id
+  );
+
+  const next360Index = (current360Index + 1) % images360.value.length;
+
+  const nextMediaIndex = allMedia.value.findIndex(
+    (media) => media.id === images360.value[next360Index].id
+  );
+
+  if (nextMediaIndex !== -1) {
+    currentMediaIndex.value = nextMediaIndex;
+    currentMedia.value = allMedia.value[nextMediaIndex];
+    initialize360Viewer();
+  }
+};
+
+// Function to focus on hotspot
+const focusOnHotspot = () => {
+  if (
+    pannellumViewer.value &&
+    currentMedia.value?.mediaType === 2 &&
+    images360.value.length > 1
+  ) {
+    pannellumViewer.value.setPitch(hotspotPosition.value.pitch, 500);
+    pannellumViewer.value.setYaw(hotspotPosition.value.yaw, 500);
+    if (isAutoRotating.value) {
+      pannellumViewer.value.stopAutoRotate();
+      isAutoRotating.value = false;
+    }
+  }
+};
+
 // 360 Image Controls
 const zoomIn = () => {
   if (pannellumViewer.value && currentMedia.value?.mediaType === 2) {
     const currentHfov = pannellumViewer.value.getHfov();
-    pannellumViewer.value.setHfov(currentHfov - 10, 200); // Zoom in by reducing HFOV
+    pannellumViewer.value.setHfov(currentHfov - 10, 200);
   }
 };
 
 const zoomOut = () => {
   if (pannellumViewer.value && currentMedia.value?.mediaType === 2) {
     const currentHfov = pannellumViewer.value.getHfov();
-    pannellumViewer.value.setHfov(currentHfov + 10, 200); // Zoom out by increasing HFOV
+    pannellumViewer.value.setHfov(currentHfov + 10, 200);
   }
 };
+
 const toggleAutoRotate = () => {
   if (pannellumViewer.value && currentMedia.value?.mediaType === 2) {
     isAutoRotating.value = !isAutoRotating.value;
-
     if (isAutoRotating.value) {
       pannellumViewer.value.startAutoRotate(-2);
     } else {
@@ -527,14 +734,19 @@ const toggleAutoRotate = () => {
 const initializeAudio = () => {
   const audioMedia = audios.value[0];
   if (audioMedia) {
-    audioElement.value = new Audio(instance.defaults.baseURL + audioMedia.mediaUrl);
+    audioElement.value = new Audio(
+      instance.defaults.baseURL + audioMedia.mediaUrl
+    );
     audioElement.value.volume = audioVolume.value;
     audioElement.value.loop = true;
-    audioElement.value.play().then(() => {
-      isAudioPlaying.value = true;
-    }).catch((error) => {
-      console.error('Lỗi khi phát audio:', error);
-    });
+    audioElement.value
+      .play()
+      .then(() => {
+        isAudioPlaying.value = true;
+      })
+      .catch((error) => {
+        console.error("Lỗi khi phát audio:", error);
+      });
   }
 };
 
@@ -544,11 +756,14 @@ const toggleAudioPlay = () => {
       audioElement.value.pause();
       isAudioPlaying.value = false;
     } else {
-      audioElement.value.play().then(() => {
-        isAudioPlaying.value = true;
-      }).catch((error) => {
-        console.error('Lỗi khi phát audio:', error);
-      });
+      audioElement.value
+        .play()
+        .then(() => {
+          isAudioPlaying.value = true;
+        })
+        .catch((error) => {
+          console.error("Lỗi khi phát audio:", error);
+        });
     }
   }
 };
@@ -571,43 +786,99 @@ const adjustVolume = () => {
 const initialize360Viewer = async () => {
   if (currentMedia.value && currentMedia.value.mediaType === 2) {
     const viewerId = `pannellum-viewer-${currentMedia.value.id}`;
-    await nextTick(); // Wait for DOM to update
+    await nextTick();
     const viewerElement = document.getElementById(viewerId);
     if (!viewerElement) {
       console.error(`Viewer element with ID ${viewerId} not found`);
       return;
     }
 
-    // Clear existing viewer if present
     if (viewerElement.firstChild) {
-      viewerElement.innerHTML = '';
+      viewerElement.innerHTML = "";
     }
 
     try {
-      const panoramaUrl = instance.defaults.baseURL + currentMedia.value.mediaUrl;
-      const response = await fetch(panoramaUrl, { method: 'HEAD' });
+      const panoramaUrl =
+        instance.defaults.baseURL + currentMedia.value.mediaUrl;
+      const response = await fetch(panoramaUrl, { method: "HEAD" });
       if (!response.ok) {
-        console.error(`Image at ${panoramaUrl} is not accessible: ${response.status}`);
+        console.error(
+          `Image at ${panoramaUrl} is not accessible: ${response.status}`
+        );
         return;
       }
 
       if (!window.pannellum) {
-        console.error('Pannellum library is not loaded');
+        console.error("Pannellum library is not loaded");
         return;
       }
 
+      // Generate random position for hotspot
+      const randomPitch = Math.random() * 180 - 90; // -90 to 90 degrees
+      const randomYaw = Math.random() * 360 - 180; // -180 to 180 degrees
+      hotspotPosition.value = { pitch: randomPitch, yaw: randomYaw }; // Store position
+
       setTimeout(() => {
         try {
-          pannellumViewer.value = window.pannellum.viewer(viewerId, {
-            type: 'equirectangular',
+          const config = {
+            type: "equirectangular",
             panorama: panoramaUrl,
             autoLoad: true,
-            showZoomCtrl: false, // Hide default zoom controls
+            showZoomCtrl: false,
             showFullscreenCtrl: true,
             autoRotate: isAutoRotating.value ? -2 : false,
-          });
+          };
+
+          if (images360.value.length > 1) {
+            console.log(
+              "Adding hotspot at pitch:",
+              randomPitch,
+              "yaw:",
+              randomYaw
+            );
+            config.hotSpots = [
+              {
+                pitch: randomPitch,
+                yaw: randomYaw,
+                type: "custom",
+                cssClass: "custom-hotspot",
+                createTooltipFunc: (hotSpotDiv) => {
+                  hotSpotDiv.innerHTML = `
+                    <img src="https://i.pinimg.com/736x/bd/61/ab/bd61ab78ce895f9e57744fe19040253c.jpg" 
+                         alt="Next 360" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                  `;
+                },
+                clickHandlerFunc: jumpToNext360,
+              },
+            ];
+          } else {
+            console.log(
+              "Not adding hotspot: only",
+              images360.value.length,
+              "360 image(s) available"
+            );
+          }
+
+          pannellumViewer.value = window.pannellum.viewer(viewerId, config);
+
+          const style = document.createElement("style");
+          style.textContent = `
+            .custom-hotspot {
+              cursor: pointer;
+              transition: transform 0.3s;
+            }
+            .custom-hotspot:hover {
+              transform: scale(1.1);
+            }
+            .custom-hotspot div {
+              width: 80px !important;
+              height: 80px !important;
+            }
+          `;
+          document.head.appendChild(style);
         } catch (error) {
-          console.error('Error initializing Pannellum viewer:', error);
+          console.error("Error initializing Pannellum viewer:", error);
         }
       }, 100);
     } catch (error) {
@@ -620,31 +891,50 @@ const initialize360Viewer = async () => {
 
 // Watch for changes in currentMedia to handle 360 viewer initialization
 watch(currentMedia, () => {
-  isAutoRotating.value = true; // Reset to auto-rotate for new 360 images
+  isAutoRotating.value = true;
   initialize360Viewer();
 });
 
-// Load Pannellum assets and data
+// Load Pannellum and Font Awesome assets and data
 onMounted(() => {
-  const existingLink = document.querySelector('link[href="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css"]');
+  // Load Pannellum CSS
+  const existingLink = document.querySelector(
+    'link[href="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css"]'
+  );
   if (!existingLink) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css';
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href =
+      "https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css";
     document.head.appendChild(link);
   }
 
-  const existingScript = document.querySelector('script[src="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.js"]');
+  // Load Pannellum JS
+  const existingScript = document.querySelector(
+    'script[src="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.js"]'
+  );
   if (!existingScript) {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.js';
+    const script = document.createElement("script");
+    script.src =
+      "https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.js";
     script.async = true;
-    script.onload = () => console.log('Pannellum script loaded');
-    script.onerror = () => console.error('Failed to load Pannellum script');
+    script.onload = () => console.log("Pannellum script loaded");
+    script.onerror = () => console.error("Failed to load Pannellum script");
     document.head.appendChild(script);
   }
 
-  // Load data
+  // Load Font Awesome
+  const existingFontAwesome = document.querySelector(
+    'link[href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"]'
+  );
+  if (!existingFontAwesome) {
+    const faLink = document.createElement("link");
+    faLink.rel = "stylesheet";
+    faLink.href =
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
+    document.head.appendChild(faLink);
+  }
+
   fetchPlaceDetails();
   fetchReviews();
   fetchMediaList();
