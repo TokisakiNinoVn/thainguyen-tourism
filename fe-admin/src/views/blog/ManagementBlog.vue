@@ -9,24 +9,34 @@
       <div class="col-12">
         <div class="card">
           <div
-            class="card-header d-flex justify-content-between align-items-center"
+            class="card-header d-flex justify-content-between align-items-center flex-wrap"
           >
             <h5 class="mb-0">Danh sách bài viết</h5>
-            <div class="filter-buttons">
-              <button
-                class="btn btn-outline-primary me-2"
-                :class="{ active: filterStatus === 'draft' }"
-                @click="filterStatus = 'draft'"
-              >
-                Chưa duyệt
-              </button>
-              <button
-                class="btn btn-outline-primary"
-                :class="{ active: filterStatus === 'approved' }"
-                @click="filterStatus = 'approved'"
-              >
-                Đã duyệt
-              </button>
+            <div class="d-flex align-items-center gap-3">
+              <div class="search-box">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Tìm kiếm theo tiêu đề..."
+                  v-model="searchQuery"
+                />
+              </div>
+              <div class="filter-buttons">
+                <button
+                  class="btn btn-outline-primary me-2"
+                  :class="{ active: filterStatus === 'draft' }"
+                  @click="filterStatus = 'draft'"
+                >
+                  Chưa duyệt
+                </button>
+                <button
+                  class="btn btn-outline-primary"
+                  :class="{ active: filterStatus === 'approved' }"
+                  @click="filterStatus = 'approved'"
+                >
+                  Đã duyệt
+                </button>
+              </div>
             </div>
           </div>
           <div class="card-body">
@@ -54,8 +64,12 @@
                       @error="handleImageError"
                     />
                   </td>
-                  <td>{{ blog.Title }}</td>
-                  <td>{{ blog.Place }}</td>
+                  <td class="text-truncate" :title="blog.Title">
+                    {{ blog.Title }}
+                  </td>
+                  <td class="text-truncate" :title="blog.Place">
+                    {{ blog.Place }}
+                  </td>
                   <td>
                     <span
                       :class="
@@ -163,18 +177,21 @@ const blogList = ref([]);
 const placeIdToDelete = ref(null);
 const showBlogDetail = ref(false);
 const selectedBlogId = ref(null);
-const filterStatus = ref("draft"); // Mặc định hiển thị bài chưa duyệt
+const filterStatus = ref("draft");
+const searchQuery = ref("");
 
 const defaultImage =
   "https://i.pinimg.com/736x/8c/73/9c/8c739c1653be69e5d9224be978c7e425.jpg";
 
-// const filteredBlog = ref([]);
-
-// Computed property để lọc danh sách bài viết theo trạng thái
 const filteredBlogs = computed(() => {
-  return blogList.value.filter(
-    (blog) => filterStatus.value === "all" || blog.Status === filterStatus.value
-  );
+  return blogList.value.filter((blog) => {
+    const matchesStatus =
+      filterStatus.value === "all" || blog.Status === filterStatus.value;
+    const matchesSearch = blog.Title.toLowerCase().includes(
+      searchQuery.value.toLowerCase()
+    );
+    return matchesStatus && matchesSearch;
+  });
 });
 
 const getListBlog = async () => {
@@ -297,5 +314,20 @@ img {
   white-space: nowrap;
   vertical-align: baseline;
   border-radius: 0.25rem;
+}
+
+.text-truncate {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-box {
+  width: 250px;
+}
+
+.search-box .form-control {
+  height: 38px;
 }
 </style>
