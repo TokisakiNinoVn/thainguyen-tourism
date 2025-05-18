@@ -65,6 +65,8 @@
             </div>
           </div>
         </div>
+
+        <ListPlaceComponnet />
       </section>
 
       <!-- Blog/Travel Stories -->
@@ -237,6 +239,7 @@ import NavbarComponentV1 from "@/components/NavbarComponentV1.vue";
 import FooterComponent from "@/components/FooterComponent.vue";
 // import Banner from "@/components/Banner.vue";
 import ListCategoryBlog from "@/pages/blog/ListCategoryBlog.vue";
+import ListPlaceComponnet from "@/pages/place/ListPlaceComponnet.vue";
 import ChatPopup from "@/pages/chat/ChatPopup.vue";
 
 const isChatOpen = ref(false);
