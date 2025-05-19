@@ -814,8 +814,8 @@ const initialize360Viewer = async () => {
       }
 
       // Generate random position for hotspot
-      const randomPitch = Math.random() * 180 - 90; // -90 to 90 degrees
-      const randomYaw = Math.random() * 360 - 180; // -180 to 180 degrees
+      const randomPitch = Math.random() * 30 - 15; // [-15, +15]
+      const randomYaw = Math.random() * 60 - 30;
       hotspotPosition.value = { pitch: randomPitch, yaw: randomYaw }; // Store position
 
       setTimeout(() => {
@@ -844,9 +844,10 @@ const initialize360Viewer = async () => {
                 cssClass: "custom-hotspot",
                 createTooltipFunc: (hotSpotDiv) => {
                   hotSpotDiv.innerHTML = `
-                    <img src="https://i.pinimg.com/736x/bd/61/ab/bd61ab78ce895f9e57744fe19040253c.jpg" 
-                         alt="Next 360" 
-                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                    <img src="https://kinhnghiemdulich.gody.vn/wp-content/uploads/2022/04/dia-diem-du-lich-thai-nguyen-9.jpg" 
+                         alt="Next 360"
+                         title="Xem ảnh 360 tiếp theo"
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 10px;">
                   `;
                 },
                 clickHandlerFunc: jumpToNext360,
