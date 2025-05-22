@@ -25,8 +25,6 @@ public class ResponseWrapperMiddleware
         try
         {
             await _next(context);
-
-            // Nếu không có dữ liệu ghi vào memStream → bỏ qua
             if (memStream.Length == 0)
             {
                 context.Response.Body = originalBody;
@@ -49,6 +47,11 @@ public class ResponseWrapperMiddleware
 
             context.Response.Body = originalBody;
             context.Response.ContentType = "application/json";
+            if (!context.Response.Headers.ContainsKey("Access-Control-Allow-Credentials"))
+            {
+                context.Response.Headers.AccessControlAllowCredentials = "true";
+            }
+
 
             // Nếu body rỗng hoặc null → không bọc
             if (string.IsNullOrWhiteSpace(bodyText))
@@ -61,7 +64,6 @@ public class ResponseWrapperMiddleware
             try
             {
                 parsedBody = JsonSerializer.Deserialize<JsonElement>(bodyText);
-
                 if (parsedBody is JsonElement element &&
                     element.TryGetProperty("code", out _) &&
                     element.TryGetProperty("status", out _) &&
@@ -88,6 +90,8 @@ public class ResponseWrapperMiddleware
 
             try
             {
+                context.Response.Headers.AccessControlAllowOrigin = context.Request.Headers.Origin.ToString();
+                context.Response.Headers.AccessControlAllowCredentials = "true";
                 await context.Response.WriteAsJsonAsync(wrapped);
             }
             catch (Exception ex)

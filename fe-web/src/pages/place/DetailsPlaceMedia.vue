@@ -49,7 +49,7 @@
           <!-- Place Info -->
           <div class="mt-8">
             <h5 class="text-xl font-semibold text-blue-600">
-              Thông tin địa điểm
+              Thông tin chi tiết
             </h5>
             <h6 class="text-2xl font-bold mt-4 mb-4">
               {{ place.name || "Đang tải..." }}
@@ -118,7 +118,7 @@
 
           <!-- Reviews -->
           <div class="mt-8">
-            <h5 class="text-xl font-semibold text-blue-600">Đánh giá</h5>
+            <h5 class="text-xl font-semibold text-blue-600">Đánh Giá</h5>
             <button
               v-if="!showReviewForm"
               class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors mt-4"
@@ -128,7 +128,7 @@
             </button>
             <div v-if="showReviewForm" class="mb-4 mt-4">
               <div class="flex items-center mb-4">
-                <span class="mr-2">Điểm đánh giá:</span>
+                <span class="mr-2">Thêm đánh giá:</span>
                 <div class="flex">
                   <button
                     v-for="star in 5"
@@ -141,7 +141,7 @@
                         : 'text-gray-300'
                     "
                   >
-                    ★
+                    ⭐
                   </button>
                 </div>
               </div>
@@ -162,7 +162,7 @@
                   class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
                   @click="cancelReview"
                 >
-                  Hủy
+                  Hủy bỏ
                 </button>
               </div>
             </div>
@@ -187,7 +187,7 @@
                       :key="star"
                       class="text-yellow-400"
                       :class="{ 'opacity-30': star > review.rating }"
-                      >★</span
+                      >⭐</span
                     >
                   </div>
                 </div>
@@ -255,7 +255,7 @@
           />
           <div
             v-if="currentMedia && currentMedia.mediaType === 2"
-            :id="'pannellum-viewer-' + currentMedia.id"
+            id="pannellum-viewer"
             class="w-full h-full"
           ></div>
           <video
@@ -352,8 +352,8 @@
               :title="
                 currentMedia?.mediaType === 2
                   ? isAutoRotating
-                    ? 'Tắt tự động xoay'
-                    : 'Bật tự động xoay'
+                    ? 'Tắt tự xoay'
+                    : 'Bật tự xoay'
                   : 'Không khả dụng'
               "
               :class="{
@@ -385,7 +385,7 @@
               @click="focusOnHotspot"
               :title="
                 currentMedia?.mediaType === 2 && images360.length > 1
-                  ? 'Xem điểm chuyển ảnh 360'
+                  ? 'Xem ảnh 360'
                   : 'Không khả dụng'
               "
               :class="{
@@ -399,7 +399,7 @@
             <button
               class="text-white hover:text-gray-300"
               @click="toggleAudioMute"
-              :title="isMuted ? 'Bật âm thanh' : 'Tắt âm thanh'"
+              :title="isMuted ? 'Phát âm thanh' : 'Tắt âm thanh'"
             >
               <svg
                 v-if="isMuted"
@@ -550,11 +550,11 @@ const audioElement = ref(null);
 const isAudioPlaying = ref(false);
 const isMuted = ref(false);
 const audioVolume = ref(0.5);
-const isAutoRotating = ref(true);
+const isAutoRotating = ref(false);
 const pannellumViewer = ref(null);
 const hotspotPosition = ref({ pitch: 0, yaw: 0 }); // Store hotspot position
 
-// format date function
+// Format date function
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString("vi-VN", {
@@ -589,7 +589,7 @@ const fetchReviews = async () => {
 // Submit review
 const submitReview = async () => {
   if (!newReview.value.rating || !newReview.value.comment.trim()) {
-    alert("Vui lòng chọn số sao và viết nhận xét!");
+    alert("Vui lòng nhập nội dung hoặc số sao!");
     return;
   }
   const isLogin = localStorage.getItem("isLoggedIn");
@@ -611,13 +611,11 @@ const submitReview = async () => {
       newReview.value = { rating: 0, comment: "" };
       showReviewForm.value = false;
       await fetchReviews();
-      alert(
-        "Đánh giá của bạn đã được gửi thành công! Chúng tôi sẽ sớm duyệt nó."
-      );
+      alert("Đánh giá đã được gửi, chờ duyệt!");
     }
   } catch (error) {
     console.error("Lỗi khi gửi đánh giá:", error);
-    alert("Đã có lỗi xảy ra khi gửi đánh giá!");
+    alert("Lỗi khi gửi đánh giá. Vui lòng thử lại sau.");
   }
 };
 
@@ -784,115 +782,129 @@ const adjustVolume = () => {
 };
 
 const initialize360Viewer = async () => {
-  if (currentMedia.value && currentMedia.value.mediaType === 2) {
-    const viewerId = `pannellum-viewer-${currentMedia.value.id}`;
-    await nextTick();
-    const viewerElement = document.getElementById(viewerId);
-    if (!viewerElement) {
-      console.error(`Viewer element with ID ${viewerId} not found`);
+  const viewerElement = document.getElementById("pannellum-viewer");
+
+  // If not a 360 image, destroy viewer and clean up
+  if (!currentMedia.value || currentMedia.value.mediaType !== 2) {
+    if (pannellumViewer.value) {
+      pannellumViewer.value.destroy();
+      pannellumViewer.value = null;
+    }
+    if (viewerElement) {
+      while (viewerElement.firstChild) {
+        viewerElement.removeChild(viewerElement.firstChild);
+      }
+    }
+    return;
+  }
+
+  await nextTick();
+  if (!viewerElement) {
+    console.error("Viewer element with ID pannellum-viewer not found");
+    return;
+  }
+
+  try {
+    const panoramaUrl = instance.defaults.baseURL + currentMedia.value.mediaUrl;
+    const response = await fetch(panoramaUrl, { method: "HEAD" });
+    if (!response.ok) {
+      console.error(
+        `Image at ${panoramaUrl} is not accessible: ${response.status}`
+      );
       return;
     }
 
-    if (viewerElement.firstChild) {
-      viewerElement.innerHTML = "";
+    if (!window.pannellum) {
+      console.error("Pannellum library is not loaded");
+      return;
     }
 
-    try {
-      const panoramaUrl =
-        instance.defaults.baseURL + currentMedia.value.mediaUrl;
-      const response = await fetch(panoramaUrl, { method: "HEAD" });
-      if (!response.ok) {
-        console.error(
-          `Image at ${panoramaUrl} is not accessible: ${response.status}`
-        );
-        return;
-      }
+    // Generate random position for hotspot
+    const randomPitch = Math.random() * 30 - 15; // [-15, +15]
+    const randomYaw = Math.random() * 60 - 30;
+    hotspotPosition.value = { pitch: randomPitch, yaw: randomYaw }; // Store position
 
-      if (!window.pannellum) {
-        console.error("Pannellum library is not loaded");
-        return;
-      }
+    const sceneId = `scene-${currentMedia.value.id}`;
+    const config = {
+      default: {
+        firstScene: sceneId,
+        sceneFadeDuration: 1000,
+      },
+      scenes: {
+        [sceneId]: {
+          type: "equirectangular",
+          panorama: panoramaUrl,
+          autoLoad: true,
+          showZoomCtrl: false,
+          showFullscreenCtrl: true,
+          autoRotate: isAutoRotating.value ? -2 : false,
+          hotSpots: [],
+        },
+      },
+    };
 
-      // Generate random position for hotspot
-      const randomPitch = Math.random() * 30 - 15; // [-15, +15]
-      const randomYaw = Math.random() * 60 - 30;
-      hotspotPosition.value = { pitch: randomPitch, yaw: randomYaw }; // Store position
-
-      setTimeout(() => {
-        try {
-          const config = {
-            type: "equirectangular",
-            panorama: panoramaUrl,
-            autoLoad: true,
-            showZoomCtrl: false,
-            showFullscreenCtrl: true,
-            autoRotate: isAutoRotating.value ? -2 : false,
-          };
-
-          if (images360.value.length > 1) {
-            console.log(
-              "Adding hotspot at pitch:",
-              randomPitch,
-              "yaw:",
-              randomYaw
-            );
-            config.hotSpots = [
-              {
-                pitch: randomPitch,
-                yaw: randomYaw,
-                type: "custom",
-                cssClass: "custom-hotspot",
-                createTooltipFunc: (hotSpotDiv) => {
-                  hotSpotDiv.innerHTML = `
-                    <img src="https://kinhnghiemdulich.gody.vn/wp-content/uploads/2022/04/dia-diem-du-lich-thai-nguyen-9.jpg" 
-                         alt="Next 360"
-                         title="Xem ảnh 360 tiếp theo"
-                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 10px;">
-                  `;
-                },
-                clickHandlerFunc: jumpToNext360,
-              },
-            ];
-          } else {
-            console.log(
-              "Not adding hotspot: only",
-              images360.value.length,
-              "360 image(s) available"
-            );
-          }
-
-          pannellumViewer.value = window.pannellum.viewer(viewerId, config);
-
-          const style = document.createElement("style");
-          style.textContent = `
-            .custom-hotspot {
-              cursor: pointer;
-              transition: transform 0.3s;
-            }
-            .custom-hotspot:hover {
-              transform: scale(1.1);
-            }
-            .custom-hotspot div {
-              width: 80px !important;
-              height: 80px !important;
-            }
-          `;
-          document.head.appendChild(style);
-        } catch (error) {
-          console.error("Error initializing Pannellum viewer:", error);
-        }
-      }, 100);
-    } catch (error) {
-      console.error(`Failed to fetch image at:`, error);
+    if (images360.value.length > 1) {
+      console.log(
+        "Adding single hotspot at pitch:",
+        randomPitch,
+        "yaw:",
+        randomYaw
+      );
+      config.scenes[sceneId].hotSpots = [
+        {
+          pitch: randomPitch,
+          yaw: randomYaw,
+          type: "custom",
+          cssClass: "custom-hotspot",
+          createTooltipFunc: (hotSpotDiv) => {
+            hotSpotDiv.innerHTML = `
+              <img
+                src="https://www.vietnamonline.com/media/uploads/froala_editor/images/VNO_THAI%20NGUYEN3.jpg"
+                alt="Next 360"
+                style="width: 60px; height: 40px; object-fit: cover; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);"
+                class="transition-transform duration-300"
+                title="Xem ảnh 360 tiếp theo"
+              />
+            `;
+          },
+          clickHandlerFunc: jumpToNext360,
+        },
+      ];
+    } else {
+      console.log(
+        "Not adding hotspot: only",
+        images360.value.length,
+        "360 image(s) available"
+      );
     }
-  } else {
-    pannellumViewer.value = null;
+
+    // If viewer already exists, load new scene; otherwise, create new viewer
+    if (pannellumViewer.value) {
+      pannellumViewer.value.destroy();
+      pannellumViewer.value = null;
+    }
+    while (viewerElement.firstChild) {
+      viewerElement.removeChild(viewerElement.firstChild);
+    }
+
+    pannellumViewer.value = window.pannellum.viewer("pannellum-viewer", config);
+
+    // Debug: Check for multiple hotspots
+    setTimeout(() => {
+      const hotspots = document.getElementsByClassName("custom-hotspot");
+      console.log("Number of hotspots in DOM:", hotspots.length);
+      const pannellumDivs = document.querySelectorAll(
+        '[id^="pannellum-viewer"]'
+      );
+      console.log("Number of pannellum divs in DOM:", pannellumDivs.length);
+    }, 500);
+  } catch (error) {
+    console.error(`Failed to fetch image or initialize viewer:`, error);
   }
 };
 
 // Watch for changes in currentMedia to handle 360 viewer initialization
 watch(currentMedia, () => {
-  isAutoRotating.value = true;
   initialize360Viewer();
 });
 
@@ -900,24 +912,24 @@ watch(currentMedia, () => {
 onMounted(() => {
   // Load Pannellum CSS
   const existingLink = document.querySelector(
-    'link[href="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css"]'
+    'link[href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"]'
   );
   if (!existingLink) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href =
-      "https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.css";
+      "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
     document.head.appendChild(link);
   }
 
   // Load Pannellum JS
   const existingScript = document.querySelector(
-    'script[src="https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.js"]'
+    'script[src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"]'
   );
   if (!existingScript) {
     const script = document.createElement("script");
     script.src =
-      "https://cdn.jsdelivr.net/npm/pannellum@2.5.5/build/pannellum.js";
+      "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
     script.async = true;
     script.onload = () => console.log("Pannellum script loaded");
     script.onerror = () => console.error("Failed to load Pannellum script");
@@ -935,6 +947,26 @@ onMounted(() => {
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
     document.head.appendChild(faLink);
   }
+
+  // Add hotspot styles once during mount
+  const style = document.createElement("style");
+  style.textContent = `
+    .custom-hotspot {
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .custom-hotspot:hover {
+      transform: scale(1.1);
+    }
+    .custom-hotspot div {
+      width: 60px !important;
+      height: 40px !important;
+    }
+    .custom-hotspot img:hover {
+      transform: scale(1.1);
+    }
+  `;
+  document.head.appendChild(style);
 
   fetchPlaceDetails();
   fetchReviews();

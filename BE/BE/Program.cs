@@ -1,37 +1,24 @@
-﻿//file: Program.cs
+﻿// file: Program.cs
 using BE;
+using BE.Middlewares;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DotNetEnv;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http.Features;
-using BE.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ======= Swagger + Controllers =======
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// ========== Load biến môi trường ==========
+Env.Load();
 
-// ======= Load biến môi trường từ .env =======
-DotNetEnv.Env.Load();
-// Console.WriteLine($"JWT_KEY: {Environment.GetEnvironmentVariable("JWT_KEY")}");
+string jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new InvalidOperationException("JWT_KEY chưa được cấu hình.");
+string jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new InvalidOperationException("JWT_ISSUER chưa được cấu hình.");
+string jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new InvalidOperationException("JWT_AUDIENCE chưa được cấu hình.");
 
-// ======= Đọc JWT từ biến môi trường và kiểm tra null =======
-var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-
-if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
-{
-    throw new InvalidOperationException("Thiếu JWT_KEY, JWT_ISSUER hoặc JWT_AUDIENCE trong file .env");
-}
-
-// ======= Kết nối Database =======
-var connectionString =
+// ========== Kết nối Database ==========
+string connectionString =
     $"server={Environment.GetEnvironmentVariable("DB_SERVER")};" +
     $"port={Environment.GetEnvironmentVariable("DB_PORT")};" +
     $"database={Environment.GetEnvironmentVariable("DB_NAME")};" +
@@ -41,35 +28,12 @@ var connectionString =
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 30))));
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:8080", "http://localhost:8081")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
-});
-
-// ======= Cấu hình Kestrel =======
-// Giới hạn kích thước file upload tối đa là 100MB
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100MB
-});
-
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100MB
-});
-
-
-// ======= JWT Authentication =======
+// ========== Cấu hình JWT ==========
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -82,14 +46,56 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-var app = builder.Build();
-app.UseVisitCounter();
+// ========== Cấu hình Kestrel ==========
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5124); // Lắng nghe từ tất cả IPs (cần thiết cho ngrok / docker)
+    serverOptions.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100MB
+});
+builder.WebHost.UseUrls("http://*:5124");
 
-// ======= Middleware Xử lý Exception Toàn Cục =======
+// ========== Cấu hình Form (multipart) ==========
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 100 * 1024 * 1024;
+});
+
+// ========== Swagger, Controllers ==========
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ========== Logging ==========
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+var app = builder.Build();
+
+// ========== Logging Request ==========
+app.Use(async (context, next) =>
+{
+    var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+    Console.WriteLine($"[{now}] {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
+    await next();
+});
+
+// ========== Middleware thứ tự quan trọng ==========
+app.UseMiddleware<CorsMiddleware>();               // CORS phải trước Authentication
+app.UseVisitCounter();                             // Đếm lượt truy cập
+
+// ======= Exception handler ==========
 app.Use(async (context, next) =>
 {
     try
     {
+        context.Response.OnStarting(() =>
+        {
+            Console.WriteLine("Origin: " + context.Request.Headers.Origin);
+            Console.WriteLine("Access-Control-Allow-Origin: " + context.Response.Headers["Access-Control-Allow-Origin"]);
+            return Task.CompletedTask;
+        });
+
         await next();
     }
     catch (Exception ex)
@@ -97,66 +103,51 @@ app.Use(async (context, next) =>
         if (!context.Response.HasStarted)
         {
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = ex switch
+            {
+                UnauthorizedAccessException or SecurityTokenException => 401,
+                _ => 500
+            };
 
-            if (ex is UnauthorizedAccessException || ex is SecurityTokenException)
+            var errorResponse = new
             {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    code = 401,
-                    status = "unauthorized",
-                    message = "Lỗi xác thực hoặc hết hạn phiên. Vui lòng đăng nhập lại.",
-                    data = (object?)null
-                });
-            }
-            else
-            {
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    code = 500,
-                    status = "error",
-                    message = "Lỗi hệ thống: " + ex.Message,
-                    data = (object?)null
-                });
-            }
+                code = context.Response.StatusCode,
+                status = context.Response.StatusCode == 401 ? "unauthorized" : "error",
+                message = context.Response.StatusCode == 401
+                    ? "Lỗi xác thực hoặc hết hạn phiên. Vui lòng đăng nhập lại."
+                    : "Lỗi hệ thống: " + ex.Message,
+                data = (object?)null
+            };
+
+            await context.Response.WriteAsJsonAsync(errorResponse);
         }
         else
         {
-            Console.WriteLine("Không thể ghi lỗi vì Response đã gửi: " + ex.Message);
+            Console.WriteLine("Không thể ghi lỗi vì response đã gửi: " + ex.Message);
         }
     }
 });
 
-// ======= Các Middleware chính =======
+// ========== Middleware chính ==========
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    // app.UseSwaggerUI();
 }
-// builder.Services.AddSwaggerGen(options =>
-// {
-//     options.SupportNonNullableReferenceTypes();
-// });
-app.UseDeveloperExceptionPage();
-app.UseExceptionHandler("/error");
 
-// app.UseStaticFiles();
-
-var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-contentTypeProvider.Mappings[".geojson"] = "application/geo+json";
-app.UseCors();
 app.UseStaticFiles(new StaticFileOptions
 {
-    ContentTypeProvider = contentTypeProvider
+    ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider
+    {
+        Mappings = { [".geojson"] = "application/geo+json" }
+    }
 });
 
-app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-// ======= Status Code Pages =======
+// ========== StatusCode Pages ==========
 app.UseStatusCodePages(async context =>
 {
     var response = context.HttpContext.Response;
@@ -165,43 +156,24 @@ app.UseStatusCodePages(async context =>
     if (response.HasStarted) return;
 
     response.ContentType = "application/json";
-
     var result = response.StatusCode switch
     {
-        403 => new
-        {
-            code = 403,
-            status = "error",
-            message = "Bạn không có quyền truy cập trang quản lý.",
-            data = (object?)null
-        },
-        404 => new
-        {
-            code = 404,
-            status = "not_found",
-            message = $"API không tồn tại: {requestPath}",
-            data = (object?)null
-        },
-        405 => new
-        {
-            code = 405,
-            status = "method_not_allowed",
-            message = "Phương thức HTTP không được hỗ trợ cho endpoint này.",
-            data = (object?)null
-        },
-        _ => new
-        {
-            code = response.StatusCode,
-            status = "error",
-            message = "Lỗi không xác định.",
-            data = (object?)null
-        }
+        403 => new { code = 403, status = "error", message = "Bạn không có quyền truy cập trang quản lý.", data = (object?)null },
+        404 => new { code = 404, status = "not_found", message = $"API không tồn tại: {requestPath}", data = (object?)null },
+        405 => new { code = 405, status = "method_not_allowed", message = "Phương thức HTTP không được hỗ trợ cho endpoint này.", data = (object?)null },
+        _ => new { code = response.StatusCode, status = "error", message = "Lỗi không xác định.", data = (object?)null }
     };
 
     await response.WriteAsJsonAsync(result);
 });
 
-// Middleware bọc response (nếu có)
-app.UseMiddleware<BE.Middlewares.ResponseWrapperMiddleware>();
+// ========== Bọc response ==========
+app.UseMiddleware<ResponseWrapperMiddleware>();
+
+// ========== Map route ==========
 app.MapControllers();
+app.MapGet("/", () => Results.Json(new { code = 200, status = "success", message = "Thành công", data = "Hello World!" }));
+app.MapGet("/error", () => Results.Json(new { code = 500, status = "error", message = "Lỗi hệ thống", data = (object?)null }));
+
+// ========== Khởi chạy ==========
 app.Run();

@@ -1,9 +1,12 @@
+// file: src/services/axiosConfig.js
 import axios from 'axios';
+// console.log('ENV:', process.env.VUE_APP_BASE_URL);
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5124',
+  baseURL: process.env.VUE_APP_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true'
   },
   withCredentials: true,
 });
